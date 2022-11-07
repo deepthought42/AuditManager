@@ -1,0 +1,7 @@
+FROM dockerfile/java:oracle-java8
+
+VOLUME /tmp
+ADD Audit_Manager.jar /opt/Audit_Manager/
+EXPOSE 8080
+WORKDIR /opt/Audit_Manager/
+CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-Xms512m", "-Xmx1g", "-jar", "Audit_Manager.jar"]
