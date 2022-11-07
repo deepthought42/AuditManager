@@ -1,8 +1,6 @@
 package com.looksee.actors;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.slf4j.Logger;
@@ -11,10 +9,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.looksee.models.Account;
-import com.looksee.models.audit.Audit;
-import com.looksee.models.enums.AuditCategory;
-import com.looksee.models.message.AuditSet;
-import com.looksee.models.message.DomainAuditMessage;
 
 import akka.actor.AbstractActor;
 import akka.cluster.Cluster;
@@ -107,7 +101,6 @@ public class Auditor extends AbstractActor{
 		   			getSender().tell( page_audit_msg, getSelf() );
 		   			//send message to either user or page channel containing reference to audits
 				})
-				*/
 				.match(DomainAuditMessage.class, domain_msg -> {
 					log.warn("audit record set message received...");
 					List<Audit> audits_executed = new ArrayList<>();
@@ -116,6 +109,7 @@ public class Auditor extends AbstractActor{
 				   		getSender().tell(new AuditSet(domain_msg.getAccountId(), audits_executed, "http://"+domain_msg.getDomain().getUrl()), getSelf());
 				   	}
 				})
+				 */
 				.match(MemberUp.class, mUp -> {
 					log.debug("Member is Up: {}", mUp.member());
 				})
