@@ -40,7 +40,6 @@ import com.looksee.models.dto.exceptions.UnknownAccountException;
 import com.looksee.models.enums.AuditName;
 import com.looksee.models.enums.AuditSubcategory;
 import com.looksee.models.enums.Priority;
-import com.looksee.security.SecurityConfig;
 import com.looksee.services.AccountService;
 import com.looksee.services.AuditRecordService;
 import com.looksee.services.AuditService;
@@ -64,9 +63,6 @@ public class AuditRecordController {
 	
 	@Autowired
 	private AccountService account_service;
-	
-    @Autowired
-    protected SecurityConfig appConfig;
     
     @Autowired
     protected AuditService audit_service;

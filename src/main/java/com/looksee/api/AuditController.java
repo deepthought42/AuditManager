@@ -42,7 +42,6 @@ import com.looksee.models.audit.UXIssueMessage;
 import com.looksee.models.audit.performance.PerformanceInsight;
 import com.looksee.models.dto.exceptions.UnknownAccountException;
 import com.looksee.models.enums.ObservationType;
-import com.looksee.security.SecurityConfig;
 import com.looksee.services.AccountService;
 import com.looksee.services.AuditRecordService;
 import com.looksee.services.AuditService;
@@ -71,9 +70,6 @@ public class AuditController {
 	
 	@Autowired
 	private AccountService account_service;
-    
-    @Autowired
-    protected SecurityConfig appConfig;
     
     @Autowired
     protected AuditService audit_service;

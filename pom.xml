@@ -4,7 +4,7 @@
 
  	<groupId>com.Looksee</groupId>
 	<version>0.0.1</version>
-	<artifactId>Audit_Manager</artifactId>
+	<artifactId>audit-manager</artifactId>
 	<packaging>jar</packaging>
 
 	<name>Look-see API</name>
