@@ -98,6 +98,7 @@ public class AuditController {
 																page_created_msg.getDomainAuditRecordId(),
 																audit_record.getId(),
 																page_created_msg.getPageId());
+			
 			String audit_record_json = mapper.writeValueAsString(audit_msg);
 			log.warn("Sending PageAuditMessage to Pub/Sub = "+audit_record_json);
 			audit_record_topic.publish(audit_record_json);

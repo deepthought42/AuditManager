@@ -3,7 +3,10 @@ package com.looksee.auditManager.models.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum ElementClassification {
-	TEMPLATE("template"), LEAF("leaf"), SLIDER("slider"), ANCESTOR("ancestor");
+	TEMPLATE("TEMPLATE"), 
+	LEAF("LEAF"), 
+	SLIDER("SLIDER"), 
+	ANCESTOR("ANCESTOR");
 	
 	private String shortName;
 
@@ -22,7 +25,7 @@ public enum ElementClassification {
             throw new IllegalArgumentException();
         }
         for(ElementClassification v : values()) {
-            if(value.equalsIgnoreCase(v.getShortName())) {
+            if(value.equals(v.getShortName())) {
                 return v;
             }
         }
