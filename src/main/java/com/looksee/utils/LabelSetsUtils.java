@@ -2,7 +2,7 @@ package com.looksee.utils;
 
 import org.springframework.stereotype.Service;
 
-import com.looksee.models.enums.FormType;
+import com.looksee.auditManager.models.enums.FormType;
 
 @Service
 public class LabelSetsUtils {

@@ -3,7 +3,7 @@ package com.looksee.models.rules;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.looksee.models.Element;
+import com.looksee.auditManager.models.Element;
 
 /**
  * Verifies that an element doesn't have any special characters in its value

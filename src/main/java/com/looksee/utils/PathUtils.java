@@ -6,15 +6,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.looksee.models.LookseeObject;
-import com.looksee.models.PageState;
-import com.looksee.models.journeys.Redirect;
-import com.looksee.models.journeys.Step;
-import com.looksee.services.TestService;
+import com.looksee.auditManager.models.LookseeObject;
+import com.looksee.auditManager.models.PageState;
+
 
 public class PathUtils {
 	@SuppressWarnings("unused")
-	private static Logger log = LoggerFactory.getLogger(TestService.class);
+	private static Logger log = LoggerFactory.getLogger(PathUtils.class);
 
 	/**
 	 * Retrieves the last {@link PageState} in the given list of {@link LookseeObject}s
@@ -37,43 +35,6 @@ public class PathUtils {
 		return null;
 	}
 	
-	/**
-	 * Retrieves the last {@link PageState} in the given list of {@link LookseeObject}s
-	 * 
-	 * @param pathObjects list of {@link LookseeObject}s in sequential order
-	 * 
-	 * @return last page state in list
-	 * 
-	 * @pre pathObjects != null
-	 */
-	public static PageState getLastPageState(List<Step> steps) {
-		assert(steps != null);
-			
-		//get last step
-		Step last_step = steps.get(steps.size()-1);
-		PageState last_page = last_step.getEndPage();
-		
-		return last_page;
-	}
-	
-	/**
-	 * Retrieves the last {@link PageState} in the given list of {@link LookseeObject}s
-	 * 
-	 * @param pathObjects list of {@link LookseeObject}s in sequential order
-	 * 
-	 * @return last page state in list
-	 * 
-	 * @pre pathObjects != null
-	 */
-	public static PageState getSecondToLastPageState(List<Step> steps) {
-		assert(steps != null);
-			
-		//get last step
-		Step last_step = steps.get(steps.size()-1);
-		PageState start_page = last_step.getStartPage();
-		
-		return start_page;
-	}
 	
 	/**
 	 * 
@@ -177,50 +138,4 @@ public class PathUtils {
 		return reduced_path_keys;
 	}
 
-	/**
-	 * 
-	 * @param pathObjects
-	 * @return
-	 * 
-	 * @pre !pathObjects.isEmpty()
-	 */
-	public static String getFirstUrl_OLD(List<LookseeObject> pathObjects) {
-		assert !pathObjects.isEmpty();
-		
-		LookseeObject obj = pathObjects.get(0);
-		
-		if(obj.getKey().contains("redirect")) {
-			log.warn("first path object is a redirect");
-			Redirect redirect = (Redirect)obj;
-			return redirect.getStartUrl();
-		}
-		else if(obj.getKey().contains("pagestate")) {
-			log.warn("first path object is a page state");
-			PageState page_state = (PageState)obj;
-			return page_state.getUrl();
-		}
-		return null;
-	}
-	
-	/**
-	 * 
-	 * @param steps
-	 * @return
-	 * 
-	 * @pre !pathObjects.isEmpty()
-	 */
-	public static String getFirstUrl(List<Step> steps) {
-		assert !steps.isEmpty();
-		
-		Step obj = steps.get(0);
-		
-		if(obj instanceof Redirect) {
-			log.warn("first path object is a redirect");
-			Redirect redirect = (Redirect)obj;
-			return redirect.getStartUrl();
-		}
-		else {
-			return obj.getStartPage().getUrl();
-		}
-	}
 }

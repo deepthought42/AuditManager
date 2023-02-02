@@ -1,6 +1,6 @@
 package com.looksee.models.rules;
 
-import com.looksee.models.Element;
+import com.looksee.auditManager.models.Element;
 
 public class RequirementRule extends Rule{
 	/**

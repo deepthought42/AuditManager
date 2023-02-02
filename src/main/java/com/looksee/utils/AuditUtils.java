@@ -7,17 +7,18 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.looksee.models.audit.Audit;
-import com.looksee.models.audit.AuditRecord;
-import com.looksee.models.audit.AuditScore;
-import com.looksee.models.audit.PageAuditRecord;
-import com.looksee.models.audit.ReadingComplexityIssueMessage;
-import com.looksee.models.audit.SentenceIssueMessage;
-import com.looksee.models.audit.StockImageIssueMessage;
-import com.looksee.models.audit.UXIssueMessage;
-import com.looksee.models.enums.AuditCategory;
-import com.looksee.models.enums.AuditName;
-import com.looksee.models.enums.AuditSubcategory;
+import com.looksee.auditManager.models.Audit;
+import com.looksee.auditManager.models.AuditRecord;
+import com.looksee.auditManager.models.AuditScore;
+import com.looksee.auditManager.models.PageAuditRecord;
+import com.looksee.auditManager.models.ReadingComplexityIssueMessage;
+import com.looksee.auditManager.models.SentenceIssueMessage;
+import com.looksee.auditManager.models.StockImageIssueMessage;
+import com.looksee.auditManager.models.UXIssueMessage;
+import com.looksee.auditManager.models.enums.AuditCategory;
+import com.looksee.auditManager.models.enums.AuditName;
+import com.looksee.auditManager.models.enums.AuditSubcategory;
+
 
 public class AuditUtils {
 	@SuppressWarnings("unused")

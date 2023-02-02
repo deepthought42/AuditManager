@@ -7,8 +7,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.looksee.models.ElementState;
-import com.looksee.models.enums.FormType;
+import com.looksee.auditManager.models.ElementState;
+import com.looksee.auditManager.models.enums.FormType;
+
 
 public class FormUtils {
 	private static Logger log = LoggerFactory.getLogger(FormUtils.class);

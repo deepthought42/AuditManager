@@ -1,6 +1,6 @@
 package com.looksee.models.rules;
 
-import com.looksee.models.Element;
+import com.looksee.auditManager.models.Element;
 
 /**
  * Creates a read-only {@link FormRule} on a {@link FormField}  

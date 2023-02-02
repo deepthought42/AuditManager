@@ -8,9 +8,10 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.looksee.models.ElementState;
-import com.looksee.models.Form;
-import com.looksee.models.PageState;
+import com.looksee.auditManager.models.ElementState;
+import com.looksee.auditManager.models.Form;
+import com.looksee.auditManager.models.PageState;
+
 
 public class PageUtils {
 	@SuppressWarnings("unused")

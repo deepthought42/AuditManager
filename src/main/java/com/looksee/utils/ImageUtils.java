@@ -22,12 +22,12 @@ import org.openimaj.image.analysis.colour.CIEDE2000;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.looksee.gcp.GoogleCloudStorage;
-import com.looksee.models.ElementState;
-import com.looksee.models.PageState;
-import com.looksee.models.audit.ColorData;
-import com.looksee.models.audit.ColorUsageStat;
-import com.looksee.models.enums.BrowserType;
+import com.looksee.auditManager.gcp.GoogleCloudStorage;
+import com.looksee.auditManager.models.ColorData;
+import com.looksee.auditManager.models.ColorUsageStat;
+import com.looksee.auditManager.models.ElementState;
+import com.looksee.auditManager.models.PageState;
+import com.looksee.auditManager.models.enums.BrowserType;
 
 import io.github.resilience4j.retry.annotation.Retry;
 
@@ -320,7 +320,11 @@ public class ImageUtils {
 
 	}
 
-	public static String createComposite(BufferedImage onload_screenshot, List<ElementState> element_states, PageState page_state, BrowserType browser) throws IOException {
+	public static String createComposite(BufferedImage onload_screenshot, 
+										 List<ElementState> element_states, 
+										 PageState page_state, 
+										 BrowserType browser) throws IOException 
+	{
 		URL page_url = new URL(BrowserUtils.sanitizeUrl(page_state.getUrl(), false));
 
 		BufferedImage composite_image = new BufferedImage(page_state.getFullPageWidth(), page_state.getFullPageHeight(), BufferedImage.TYPE_INT_ARGB);

@@ -2,10 +2,8 @@ package com.looksee.models.rules;
 
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.looksee.browsing.form.FormField;
-import com.looksee.models.Element;
-import com.looksee.models.LookseeObject;
-import com.looksee.models.rules.RuleType;
+import com.looksee.auditManager.models.Element;
+import com.looksee.auditManager.models.LookseeObject;
 import com.looksee.models.serializer.RuleDeserializer;
 
 /**

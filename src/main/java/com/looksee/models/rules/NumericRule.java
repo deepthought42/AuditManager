@@ -2,7 +2,7 @@ package com.looksee.models.rules;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.looksee.models.Element;
+import com.looksee.auditManager.models.Element;
 
 
 /**

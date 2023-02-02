@@ -3,7 +3,7 @@ package com.looksee.models.rules;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.looksee.models.Element;
+import com.looksee.auditManager.models.Element;
 
 /**
  * Defines a {@link Rule} where the numbers 1-9 cannot appear in a given value when evaluated
