@@ -3,7 +3,9 @@ package com.looksee.auditManager.models.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum FormStatus {
-	DISCOVERED("discovered"), ACTION_REQUIRED("action_required"), CLASSIFIED("classified");
+	DISCOVERED("discovered"), 
+	ACTION_REQUIRED("action_required"), 
+	CLASSIFIED("classified");
 	
 	private String shortName;
 

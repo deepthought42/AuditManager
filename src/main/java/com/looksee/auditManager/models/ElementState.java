@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.neo4j.core.schema.CompositeProperty;
 import org.springframework.data.neo4j.core.schema.Node;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.looksee.auditManager.models.enums.ElementClassification;
 
 
@@ -21,7 +20,6 @@ import com.looksee.auditManager.models.enums.ElementClassification;
  *  may be a Parent and/or child of another ElementState. This heirarchy is not
  *  maintained by ElementState though. 
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Node
 public class ElementState extends LookseeObject implements Comparable<ElementState> {
 	@SuppressWarnings("unused")
@@ -48,11 +46,15 @@ public class ElementState extends LookseeObject implements Comparable<ElementSta
 	private boolean visible;
 	
 	@CompositeProperty
-	private Map<String, String> rendered_css_values = new HashMap<>();
+	private Map<String, String> renderedCssValues = new HashMap<>();
 	
 	@CompositeProperty
 	private Map<String, String> attributes = new HashMap<>();
-
+	
+	/*
+	@Relationship(type = "HAS_CHILD", direction = Direction.OUTGOING)
+	private List<ElementState> childElements = new ArrayList<>();
+*/
 	public ElementState(){
 		super();
 	}
@@ -253,6 +255,7 @@ public class ElementState extends LookseeObject implements Comparable<ElementSta
 		log.warn("element x_loc :: "+getXLocation());
 		log.warn("element y_loc :: "+getYLocation());
 		log.warn("element attr :: "+getAttributes());
+		//log.warn("element children :: "+getChildElements());
 		log.warn("element classification :: "+getClassification());
 		log.warn("element created_at :: "+getCreatedAt());
 
@@ -332,10 +335,6 @@ public class ElementState extends LookseeObject implements Comparable<ElementSta
 		return outerHtml;
 	}
 
-	public boolean isLeaf() {
-		return getClassification().equals(ElementClassification.LEAF);
-	}
-
 	public ElementClassification getClassification() {
 		return ElementClassification.create(classification);
 	}
@@ -344,12 +343,25 @@ public class ElementState extends LookseeObject implements Comparable<ElementSta
 		this.classification = classification.toString();
 	}
 	
+	/*
+	public List<ElementState> getChildElements() {
+		return childElements;
+	}
+
+	public void setChildElements(List<ElementState> child_elements) {
+		this.childElements = child_elements;
+	}
+	
+	public void addChildElement(ElementState child_element) {
+		this.childElements.add(child_element);
+	}
+*/
 	public Map<String, String> getRenderedCssValues() {
-		return rendered_css_values;
+		return renderedCssValues;
 	}
 
 	public void setRenderedCssValues(Map<String, String> rendered_css_values) {
-		this.rendered_css_values.putAll(rendered_css_values);
+		this.renderedCssValues.putAll(rendered_css_values);
 	}
 
 	public boolean isVisible() {

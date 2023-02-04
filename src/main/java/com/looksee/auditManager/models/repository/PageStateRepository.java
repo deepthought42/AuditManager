@@ -63,7 +63,7 @@ public interface PageStateRepository extends Neo4jRepository<PageState, Long> {
 	@Query("MATCH (p:PageState{key:$page_state_key})-[*]->(a:Audit{subcategory:$subcategory}) RETURN a")
 	public Audit findAuditBySubCategory(@Param("subcategory") String subcategory, @Param("page_state_key") String page_state_key);
 
-	@Query("MATCH (p:PageState{key:$page_state_key})-[:HAS]->(e:ElementState{classification:'leaf'}) where e.visible=true RETURN e")
+	@Query("MATCH (p:PageState{key:$page_state_key})-[:HAS]->(e:ElementState{classification:'LEAF'}) where e.visible=true RETURN e")
 	public List<ElementState> getVisibleLeafElements(@Param("page_state_key") String page_state_key);
 
 	@Query("ps:PageState{key:$page_state_key}) return p LIMIT 1")

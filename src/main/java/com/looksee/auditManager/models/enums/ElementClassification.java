@@ -25,7 +25,7 @@ public enum ElementClassification {
             throw new IllegalArgumentException();
         }
         for(ElementClassification v : values()) {
-            if(value.equals(v.getShortName())) {
+            if(value.equalsIgnoreCase(v.getShortName())) {
                 return v;
             }
         }

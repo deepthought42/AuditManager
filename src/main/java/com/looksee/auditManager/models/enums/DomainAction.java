@@ -3,7 +3,8 @@ package com.looksee.auditManager.models.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum DomainAction {
-	CREATE("create"), DELETE("delete");
+	CREATE("create"), 
+	DELETE("delete");
 	
 	private String shortName;
 

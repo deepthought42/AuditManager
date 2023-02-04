@@ -69,7 +69,7 @@ public interface ElementStateRepository extends Neo4jRepository<ElementState, Lo
 	@Query("MATCH (e:ElementState) WHERE e.key IN $element_keys RETURN e")
 	public List<ElementState> getElements(@Param("element_keys")  Set<String> existing_keys);
 	
-	@Query("MATCH (p:PageState) WITH p WHERE id(p)=$page_state_id MATCH (p)-[:HAS]->(e:ElementState) where e.visible=true AND e.classification='leaf' RETURN e")
+	@Query("MATCH (p:PageState) WITH p WHERE id(p)=$page_state_id MATCH (p)-[:HAS]->(e:ElementState) where e.visible=true AND e.classification'LEAF' RETURN e")
 	public List<ElementState> getVisibleLeafElements(@Param("page_state_id") long page_state_id);
 	
 	@Query("MATCH (p:PageState)-[:HAS]->(e:ElementState{name:'a'}) WHERE id(p)=$page_state_id RETURN DISTINCT e")

@@ -6,10 +6,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
  * Defines all types of {@link Audit audits} that exist in the system
  */
 public enum AuditCategory {
-	CONTENT("Content"), 
-	INFORMATION_ARCHITECTURE("Information Architecture"), 
-	AESTHETICS("Aesthetics"),
-	ACCESSIBILITY("Accessibility");
+	CONTENT("CONTENT"), 
+	INFORMATION_ARCHITECTURE("INFORMATION_ARCHITECTURE"), 
+	AESTHETICS("AESTHETICS"),
+	ACCESSIBILITY("ACCESSIBILITY");
 	
 	private String shortName;
 

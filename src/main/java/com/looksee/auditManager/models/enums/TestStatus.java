@@ -3,7 +3,10 @@ package com.looksee.auditManager.models.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum TestStatus {
-	PASSING("PASSING"), FAILING("FAILING"), UNVERIFIED("UNVERIFIED"), RUNNING("RUNNING");
+	PASSING("PASSING"), 
+	FAILING("FAILING"), 
+	UNVERIFIED("UNVERIFIED"), 
+	RUNNING("RUNNING");
 	
 	private String shortName;
 

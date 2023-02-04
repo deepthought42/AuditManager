@@ -266,10 +266,6 @@ public class Element extends LookseeObject implements Comparable<Element> {
 		this.template = template;
 	}
 
-	public boolean isLeaf() {
-		return getClassification().equals(ElementClassification.LEAF);
-	}
-
 	public ElementClassification getClassification() {
 		return ElementClassification.create(classification);
 	}

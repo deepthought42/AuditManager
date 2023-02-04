@@ -7,23 +7,23 @@ import com.fasterxml.jackson.annotation.JsonCreator;
  */
 public enum AuditName {
 	//color management
-	COLOR_PALETTE("Color Palette"),
-	TEXT_BACKGROUND_CONTRAST("Text Background Contrast"),
-	NON_TEXT_BACKGROUND_CONTRAST("Non Text Background Contrast"),
+	COLOR_PALETTE("Color_Palette"),
+	TEXT_BACKGROUND_CONTRAST("Text_Background_Contrast"),
+	NON_TEXT_BACKGROUND_CONTRAST("Non_Text_Background_Contrast"),
 	LINKS("Links"),
 	TYPEFACES("Typefaces"),
 	FONT("Font"),
 	PADDING("Padding"),
 	MARGIN("Margin"),
-	MEASURE_UNITS("Measure Units"),
+	MEASURE_UNITS("Measure_Units"),
 	TITLES("Titles"),
-	ALT_TEXT("Alt Text"),
+	ALT_TEXT("Alt_Text"),
 	PARAGRAPHING("Paragraphing"),
 	METADATA("Metadata"),
 	UNKNOWN("Unknown"), 
-	IMAGE_COPYRIGHT("Image Copyright"), 
+	IMAGE_COPYRIGHT("Image_Copyright"), 
 	IMAGE_POLICY("Image Policy"), 
-	READING_COMPLEXITY("Reading Complexity");
+	READING_COMPLEXITY("Reading_Complexity");
 	
 	private String shortName;
 

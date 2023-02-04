@@ -1,20 +1,19 @@
-package com.looksee.models.enums;
+package com.looksee.auditManager.models.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 /**
- * Defines all types of {@link Audit audits} that exist in the system
+ * ready - ready for expansion
+ * expanded - path has already been expanded and is ready for exploration
  */
-public enum Priority {
-	HIGH("high"), 
-	MEDIUM("medium"), 
-	LOW("low"),
-	NONE("none");
+public enum PathStatus {
+	READY("ready"), 
+	EXPANDED("expanded"), 
+	EXAMINED("examined");
 	
-
 	private String shortName;
 
-	Priority (String shortName) {
+	PathStatus (String shortName) {
         this.shortName = shortName;
     }
 
@@ -24,11 +23,11 @@ public enum Priority {
     }
 
     @JsonCreator
-    public static Priority create (String value) {
-    	assert value != null;
-    	assert !value.isEmpty();
-    
-        for(Priority v : values()) {
+    public static PathStatus create (String value) {
+        if(value == null) {
+            throw new IllegalArgumentException();
+        }
+        for(PathStatus v : values()) {
             if(value.equalsIgnoreCase(v.getShortName())) {
                 return v;
             }
