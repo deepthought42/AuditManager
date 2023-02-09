@@ -4,24 +4,24 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.neo4j.core.schema.Node;
 
 import com.looksee.auditManager.models.enums.AuditCategory;
 import com.looksee.auditManager.models.enums.ObservationType;
 import com.looksee.auditManager.models.enums.Priority;
 
 
-
 /**
  * A observation of potential error for a given color palette 
  */
+@Node
 public class ColorContrastIssueMessage extends ElementStateIssueMessage{
-	@SuppressWarnings("unused")
 	private static Logger log = LoggerFactory.getLogger(ColorContrastIssueMessage.class);
 
 	private double contrast;
-	private String foregroundColor;
-	private String backgroundColor;
-	private String fontSize;
+	private String foreground_color;
+	private String background_color;
+	private String font_size;
 	
 	public ColorContrastIssueMessage() {}
 	
@@ -101,26 +101,26 @@ public class ColorContrastIssueMessage extends ElementStateIssueMessage{
 	}
 
 	public String getForegroundColor() {
-		return foregroundColor;
+		return foreground_color;
 	}
 
 	public void setForegroundColor(String foreground_color) {
-		this.foregroundColor = foreground_color;
+		this.foreground_color = foreground_color;
 	}
 
 	public String getBackgroundColor() {
-		return backgroundColor;
+		return background_color;
 	}
 
 	public void setBackgroundColor(String background_color) {
-		this.backgroundColor = background_color;
+		this.background_color = background_color;
 	}
 
 	public String getFontSize() {
-		return fontSize;
+		return font_size;
 	}
 
 	public void setFontSize(String font_size) {
-		this.fontSize = font_size;
+		this.font_size = font_size;
 	}
 }

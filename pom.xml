@@ -290,13 +290,7 @@
 				</exclusion>
 	     	</exclusions>
 		</dependency>
-		
-		<!-- https://mvnrepository.com/artifact/io.whelk.flesch.kincaid/whelk-flesch-kincaid -->
-		<dependency>
-		    <groupId>io.whelk.flesch.kincaid</groupId>
-		    <artifactId>whelk-flesch-kincaid</artifactId>
-		    <version>0.1.6</version>
-		</dependency>
+
 		<dependency>
 			<groupId>com.looksee</groupId>
 			<artifactId>journeyExpander</artifactId>

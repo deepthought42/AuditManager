@@ -2,20 +2,21 @@ package com.looksee.auditManager.models;
 
 import java.util.Set;
 
+import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
 import com.looksee.auditManager.models.enums.AuditCategory;
 import com.looksee.auditManager.models.enums.ObservationType;
 import com.looksee.auditManager.models.enums.Priority;
 
-
 /**
  * A observation of potential error for a given {@link Element element} 
  */
+@Node
 public class PageStateIssueMessage extends UXIssueMessage {
 
 	@Relationship(type = "FOR")
-	private PageState pageState;
+	private PageState page_state;
 	
 	public PageStateIssueMessage() {}
 	
@@ -47,11 +48,11 @@ public class PageStateIssueMessage extends UXIssueMessage {
 	}
 
 	public PageState getElements() {
-		return pageState;
+		return page_state;
 	}
 
 
 	public void setPage(PageState page_state) {
-		this.pageState = page_state;
+		this.page_state = page_state;
 	}
 }

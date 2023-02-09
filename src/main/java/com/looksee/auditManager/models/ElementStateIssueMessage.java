@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
 import com.looksee.auditManager.models.enums.AuditCategory;
@@ -15,6 +16,7 @@ import com.looksee.auditManager.models.enums.Priority;
 /**
  * A observation of potential error for a given {@link Element element} 
  */
+@Node
 public class ElementStateIssueMessage extends UXIssueMessage {	
 	private static Logger log = LoggerFactory.getLogger(ElementStateIssueMessage.class);
 

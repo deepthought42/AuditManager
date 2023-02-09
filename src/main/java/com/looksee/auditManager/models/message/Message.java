@@ -1,7 +1,7 @@
 package com.looksee.auditManager.models.message;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
-import org.threeten.bp.LocalDateTime;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -14,7 +14,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 public abstract class Message {
 	private String messageId;
 	
-
 	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime publishTime;

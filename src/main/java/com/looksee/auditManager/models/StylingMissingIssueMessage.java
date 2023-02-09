@@ -2,6 +2,8 @@ package com.looksee.auditManager.models;
 
 import java.util.Set;
 
+import org.springframework.data.neo4j.core.schema.Node;
+
 import com.looksee.auditManager.models.enums.ObservationType;
 import com.looksee.auditManager.models.enums.Priority;
 import com.looksee.auditManager.models.recommend.Recommendation;
@@ -11,6 +13,7 @@ import com.looksee.auditManager.models.recommend.Recommendation;
  * Details issues for when a page is devoid of a certain styling such as padding, 
  * that should be used, because it adds extra white-space to the content
  */
+@Node
 public class StylingMissingIssueMessage extends UXIssueMessage {
 	
 	public StylingMissingIssueMessage(

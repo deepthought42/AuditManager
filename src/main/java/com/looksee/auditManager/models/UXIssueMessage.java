@@ -5,26 +5,27 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.neo4j.core.schema.Node;
 
 import com.looksee.auditManager.models.enums.AuditCategory;
 import com.looksee.auditManager.models.enums.ObservationType;
 import com.looksee.auditManager.models.enums.Priority;
 
-
+@Node
 public class UXIssueMessage extends LookseeObject {
 	private static Logger log = LoggerFactory.getLogger(UXIssueMessage.class);
 
 	private String title;
 	private String description;
-	private String whyItMatters;
+	private String why_it_matters;
 	private String recommendation;
 	private String priority;
 	private String type;
 	private String category;
-	private String wcagCompliance;
+	private String wcag_compliance;
 	private Set<String> labels;
 	private int points;
-	private int maxPoints;
+	private int max_points;
 	private int score;
 
 	public UXIssueMessage() {}
@@ -125,19 +126,19 @@ public class UXIssueMessage extends LookseeObject {
 	}
 
 	public String getWcagCompliance() {
-		return wcagCompliance;
+		return wcag_compliance;
 	}
 
 	public void setWcagCompliance(String wcag_compliance) {
-		this.wcagCompliance = wcag_compliance;
+		this.wcag_compliance = wcag_compliance;
 	}
 
 	public String getWhyItMatters() {
-		return whyItMatters;
+		return why_it_matters;
 	}
 
 	public void setWhyItMatters(String why_it_matters) {
-		this.whyItMatters = why_it_matters;
+		this.why_it_matters = why_it_matters;
 	}
 
 	public String getTitle() {
@@ -157,11 +158,11 @@ public class UXIssueMessage extends LookseeObject {
 	}
 
 	public int getMaxPoints() {
-		return maxPoints;
+		return max_points;
 	}
 
 	public void setMaxPoints(int max_points) {
-		this.maxPoints = max_points;
+		this.max_points = max_points;
 	}
 
 	public String getRecommendation() {

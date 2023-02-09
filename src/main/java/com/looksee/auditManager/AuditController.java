@@ -36,15 +36,13 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.looksee.auditManager.gcp.PubSubAuditUpdatePublisherImpl;
 import com.looksee.auditManager.gcp.PubSubPageAuditPublisherImpl;
 import com.looksee.auditManager.mapper.Body;
-import com.looksee.auditManager.models.AuditProgressUpdate;
 import com.looksee.auditManager.models.AuditRecord;
-import com.looksee.auditManager.models.enums.AuditPhase;
 import com.looksee.auditManager.models.enums.ExecutionStatus;
 import com.looksee.auditManager.models.message.PageAuditMessage;
 import com.looksee.auditManager.models.message.PageBuiltMessage;
+import com.looksee.auditManager.services.AccountService;
 import com.looksee.auditManager.services.AuditRecordService;
 import com.looksee.auditManager.models.PageAuditRecord;
 
@@ -60,7 +58,8 @@ public class AuditController {
 	private PubSubPageAuditPublisherImpl audit_record_topic;
 	
 	@Autowired
-	private PubSubAuditUpdatePublisherImpl audit_update_topic;
+	private AccountService account_service;
+	
 	
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<String> receiveMessage(@RequestBody Body body) throws JsonMappingException, JsonProcessingException, ExecutionException, InterruptedException {
@@ -81,16 +80,24 @@ public class AuditController {
 			return new ResponseEntity<String>("Page "+page_created_msg.getPageId()+" was already audited", HttpStatus.OK);
 		}
 		else {
-			//add page to domain audit record. This is how things work at the moment, so propagating forward.
-		    // DO NOT DELETE UNLESS YOU HAVE UPDATED ALL LOGIC THAT THIS IMPACTS FOR AUDITS AND JOURNEY EXPANSION
-			//TODO : replace need for page to be directly associated with DomainAuditRecord for stats on front end
-			audit_record_service.addPageToAuditRecord(page_created_msg.getDomainAuditRecordId(), page_created_msg.getPageId());
-
 			AuditRecord audit_record = new PageAuditRecord(ExecutionStatus.BUILDING_PAGE, new HashSet<>(), true);
 			audit_record = audit_record_service.save(audit_record);
-			audit_record_service.addPageToAuditRecord(audit_record.getId(), page_created_msg.getPageId());
-			audit_record_service.addPageAuditToDomainAudit(page_created_msg.getDomainAuditRecordId(),
-															audit_record.getId());
+			audit_record_service.addPageToAuditRecord(audit_record.getId(), 
+													  page_created_msg.getPageId());
+			if(page_created_msg.getDomainAuditRecordId() < 0) {
+				account_service.addAuditRecord(page_created_msg.getAccountId(), 
+											   audit_record.getId());
+			}
+			else {				
+				//add page to domain audit record. This is how things work at the moment, so propagating forward.
+				// DO NOT DELETE UNLESS YOU HAVE UPDATED ALL LOGIC THAT THIS IMPACTS FOR AUDITS AND JOURNEY EXPANSION
+				//TODO : replace need for page to be directly associated with DomainAuditRecord for stats on front end
+				audit_record_service.addPageToAuditRecord(page_created_msg.getDomainAuditRecordId(), 
+														  page_created_msg.getPageId());
+				
+				audit_record_service.addPageAuditToDomainAudit(page_created_msg.getDomainAuditRecordId(),
+																audit_record.getId());
+			}
 			
 			//send message to page audit message topic
 			PageAuditMessage audit_msg = new PageAuditMessage(	page_created_msg.getAccountId(),
@@ -103,18 +110,6 @@ public class AuditController {
 			log.warn("Sending PageAuditMessage to Pub/Sub = "+audit_record_json);
 			audit_record_topic.publish(audit_record_json);
 		}
-		
-		
-		AuditProgressUpdate audit_update = new AuditProgressUpdate( page_created_msg.getAccountId(), 
-																	page_created_msg.getDomainId(), 
-																	page_created_msg.getDomainAuditRecordId(), 
-																	AuditPhase.START_AUDIT, 
-																	"Starting audits for page with url "+page_created_msg.getPageId());
-		
-		String audit_update_json = mapper.writeValueAsString(audit_update);
-		log.warn("Sending AuditProgressMessage to Pub/Sub = "+audit_update_json);
-
-		audit_update_topic.publish(audit_update_json);
 		
 		
 		//update audit record

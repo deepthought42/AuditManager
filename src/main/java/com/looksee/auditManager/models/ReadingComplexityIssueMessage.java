@@ -2,15 +2,17 @@ package com.looksee.auditManager.models;
 
 import java.util.Set;
 
+import org.springframework.data.neo4j.core.schema.Node;
+
 import com.looksee.auditManager.models.enums.AuditCategory;
 import com.looksee.auditManager.models.enums.Priority;
-
 
 /**
  * A observation of potential error for a given {@link Element element} 
  */
+@Node
 public class ReadingComplexityIssueMessage extends ElementStateIssueMessage {	
-	private double easeOfReadingScore;
+	private double ease_of_reading_score;
 
 	public ReadingComplexityIssueMessage() {}
 	
@@ -42,11 +44,11 @@ public class ReadingComplexityIssueMessage extends ElementStateIssueMessage {
 	}
 
 	public double getEaseOfReadingScore() {
-		return easeOfReadingScore;
+		return ease_of_reading_score;
 	}
 
 	public void setEaseOfReadingScore(double ease_of_reading_score) {
-		this.easeOfReadingScore = ease_of_reading_score;
+		this.ease_of_reading_score = ease_of_reading_score;
 	}
 
 }

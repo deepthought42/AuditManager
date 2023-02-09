@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.data.neo4j.core.schema.Node;
+
 import com.looksee.auditManager.models.enums.AuditCategory;
 import com.looksee.auditManager.models.enums.ObservationType;
 import com.looksee.auditManager.models.enums.Priority;
@@ -11,6 +13,7 @@ import com.looksee.auditManager.models.enums.Priority;
 /**
  * A observation of potential error for a given {@link Element element} 
  */
+@Node
 public class TypefacesIssue extends UXIssueMessage {	
 	private List<String> typefaces = new ArrayList<>();
 	

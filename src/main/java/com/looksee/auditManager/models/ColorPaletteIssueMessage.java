@@ -5,21 +5,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.data.neo4j.core.schema.Node;
+
 import com.looksee.auditManager.models.enums.AuditCategory;
 import com.looksee.auditManager.models.enums.ColorScheme;
 import com.looksee.auditManager.models.enums.ObservationType;
 import com.looksee.auditManager.models.enums.Priority;
 
-
 /**
  * A observation of potential error for a given color palette 
  */
+@Node
 public class ColorPaletteIssueMessage extends UXIssueMessage{
 	
-	private List<String> paletteColors = new ArrayList<>();
+	private List<String> palette_colors = new ArrayList<>();
 	
 	private Set<String> colors = new HashSet<>();
-	private String colorScheme;
+	private String color_scheme;
 	
 	public ColorPaletteIssueMessage() {
 		setPaletteColors(new ArrayList<>());
@@ -89,18 +91,18 @@ public class ColorPaletteIssueMessage extends UXIssueMessage{
 	}
 
 	public ColorScheme getColorScheme() {
-		return ColorScheme.create(colorScheme);
+		return ColorScheme.create(color_scheme);
 	}
 
 	public void setColorScheme(ColorScheme color_scheme) {
-		this.colorScheme = color_scheme.getShortName();
+		this.color_scheme = color_scheme.getShortName();
 	}
 
 	public List<String> getPaletteColors() {
-		return paletteColors;
+		return palette_colors;
 	}
 
 	public void setPaletteColors(List<String> palette) {
-		this.paletteColors.addAll(palette);
+		this.palette_colors.addAll(palette);
 	}
 }

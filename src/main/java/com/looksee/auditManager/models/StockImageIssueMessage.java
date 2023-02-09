@@ -2,6 +2,8 @@ package com.looksee.auditManager.models;
 
 import java.util.Set;
 
+import org.springframework.data.neo4j.core.schema.Node;
+
 import com.looksee.auditManager.models.enums.AuditCategory;
 import com.looksee.auditManager.models.enums.Priority;
 
@@ -9,8 +11,9 @@ import com.looksee.auditManager.models.enums.Priority;
 /**
  * A observation of potential error for a given {@link Element element} 
  */
+@Node
 public class StockImageIssueMessage extends ElementStateIssueMessage {	
-	private boolean stockImage;
+	private boolean stock_image;
 
 	public StockImageIssueMessage() {}
 	
@@ -42,10 +45,10 @@ public class StockImageIssueMessage extends ElementStateIssueMessage {
 	}
 
 	public boolean isStockImage() {
-		return stockImage;
+		return stock_image;
 	}
 
 	public void setStockImage(boolean stock_image) {
-		this.stockImage = stock_image;
+		this.stock_image = stock_image;
 	}
 }
