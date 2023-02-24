@@ -7,23 +7,23 @@ import com.fasterxml.jackson.annotation.JsonCreator;
  */
 public enum AuditSubcategory {
 	//color management
-	WRITTEN_CONTENT("Written_Content"),
-	IMAGERY("Imagery"),
-	VIDEOS("Videos"),
-	AUDIO("Audio"),
-	MENU_ANALYSIS("Menu_Analysis"),
-	PERFORMANCE("Performance"),
+	WRITTEN_CONTENT("WRITTEN_CONTENT"),
+	IMAGERY("IMAGERY"),
+	VIDEOS("VIDEOS"),
+	AUDIO("AUDIO"),
+	MENU_ANALYSIS("MENU_ANALYSIS"),
+	PERFORMANCE("PERFORMANCE"),
 	SEO("SEO"),
-	TYPOGRAPHY("Typography"),
-	COLOR_MANAGEMENT("Color_Management"),
-	TEXT_CONTRAST("Text Contrast"), // REMOVE THIS
-	NON_TEXT_CONTRAST("Non-Text_Contrast"), // REMOVE THIS
-	WHITESPACE("Whitespace"),
-	BRANDING("Branding"),
-	SECURITY("Security"),
-	LINKS("Links"),					//REMOVE THIS
-	NAVIGATION("Navigation"), 
-	INFORMATION_ARCHITECTURE("Information_Architecture");
+	TYPOGRAPHY("TYPOGRAPHY"),
+	COLOR_MANAGEMENT("COLOR_MANAGEMENT"),
+	TEXT_CONTRAST("TEXT_CONTRAST"), 
+	NON_TEXT_CONTRAST("NON_TEXT_CONTRAST"), 
+	WHITESPACE("WHITESPACE"),
+	BRANDING("BRANDING"),
+	SECURITY("SECURITY"),
+	LINKS("LINKS"),					
+	NAVIGATION("NAVIGATION"), 
+	INFORMATION_ARCHITECTURE("INFORMATION_ARCHITECTURE");
 	
 	private String shortName;
 

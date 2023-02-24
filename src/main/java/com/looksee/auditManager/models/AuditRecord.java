@@ -6,11 +6,10 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.neo4j.core.schema.Node;
-import org.springframework.data.neo4j.core.schema.Relationship;
 
 import com.looksee.auditManager.models.enums.AuditLevel;
+import com.looksee.auditManager.models.enums.AuditName;
 import com.looksee.auditManager.models.enums.ExecutionStatus;
-import com.looksee.auditManager.models.journeys.DomainMap;
 
 /**
  * Record detailing an set of {@link Audit audits}.
@@ -38,12 +37,12 @@ public class AuditRecord extends LookseeObject {
 
 	private String targetUserAge;
 	private String targetUserEducation;
+	
+	private List<AuditName> auditLabels;
+
 
 	//DESIGN SYSTEM VALUES
 	private List<String> colors;
-	
-	@Relationship(type="CONTAINS")
-	private DomainMap domain_map;
 	
 	public AuditRecord() {
 		setStartTime(LocalDateTime.now());
@@ -72,8 +71,8 @@ public class AuditRecord extends LookseeObject {
 					   AuditLevel level, 
 					   String key, 
 					   LocalDateTime startTime,
-					   double aestheticAuditProgress, 
 					   String aestheticMsg, 
+					   double aestheticAuditProgress, 
 					   String contentAuditMsg, 
 					   double contentAuditProgress,
 					   String infoArchMsg, 
@@ -226,6 +225,14 @@ public class AuditRecord extends LookseeObject {
 	public void setStatusMessage(String status_message) {
 		this.statusMessage = status_message;
 	}
+
+	public List<AuditName> getAuditLabels() {
+		return auditLabels;
+	}
+
+	public void setAuditLabels(List<AuditName> auditLabels) {
+		this.auditLabels = auditLabels;
+	}
 	
 	@Override
 	public String toString() {
@@ -246,8 +253,8 @@ public class AuditRecord extends LookseeObject {
 							   getLevel(),
 							   getKey(),
 							   getStartTime(),
-							   getAestheticAuditProgress(), 
 							   getAestheticMsg(), 
+							   getAestheticAuditProgress(), 
 							   getContentAuditMsg(), 
 							   getContentAuditProgress(), 
 							   getInfoArchMsg(), 
@@ -281,13 +288,5 @@ public class AuditRecord extends LookseeObject {
 		}
 		
 		return true;	
-	}
-
-	public DomainMap getDomainMap() {
-		return domain_map;
-	}
-
-	public void setDomainMap(DomainMap domain_map) {
-		this.domain_map = domain_map;
 	}
 }
