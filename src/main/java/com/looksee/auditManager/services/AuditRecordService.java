@@ -266,10 +266,6 @@ public class AuditRecordService {
 		return audit_record_repo.getAllAestheticsAudits(id);
 	}
 
-	public PageState getPageStateForAuditRecord(long page_audit_id) {
-		return audit_record_repo.getPageStateForAuditRecord(page_audit_id);
-	}
-
 	public Set<UXIssueMessage> getIssues(long audit_record_id) {
 		return audit_record_repo.getIssues(audit_record_id);
 	}
