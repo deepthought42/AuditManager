@@ -18,8 +18,6 @@ public abstract class Message {
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime publishTime;
 	private long accountId;
-	private long domainId;
-	private long domainAuditRecordId;
 	
 	public Message(){
 		setAccountId(-1);
@@ -30,16 +28,13 @@ public abstract class Message {
 	/**
 	 * 
 	 * @param account_id
-	 * @param audit_record_id TODO
 	 * @param domain eg. example.com
 	 */
-	public Message(long account_id, long audit_record_id, long domain_id){
+	public Message(long account_id){
 		this.messageId = UUID.randomUUID().toString();
 		this.publishTime = LocalDateTime.now();
 		
 		setAccountId(account_id);
-		setDomainAuditRecordId(audit_record_id);
-		setDomainId(domain_id);
 	}
 	
 	public long getAccountId() {
@@ -50,22 +45,6 @@ public abstract class Message {
 		this.accountId = account_id;
 	}
 
-	public long getDomainAuditRecordId() {
-		return domainAuditRecordId;
-	}
-
-	public void setDomainAuditRecordId(long audit_record_id) {
-		this.domainAuditRecordId = audit_record_id;
-	}
-
-	public long getDomainId() {
-		return domainId;
-	}
-
-	public void setDomainId(long domain_id) {
-		this.domainId = domain_id;
-	}
-	
 	public String getMessageId() {
 		return messageId;
     }

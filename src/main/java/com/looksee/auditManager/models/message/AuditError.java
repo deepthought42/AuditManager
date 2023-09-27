@@ -14,7 +14,7 @@ public class AuditError extends Message{
 					  double progress, 
 					  long domainId
 	) {
-		super(accountId, auditRecordId, domainId);
+		super(accountId);
 		setErrorMessage(error_message);
 		setAuditCategory(category);
 		setProgress(progress);

@@ -46,7 +46,9 @@ import com.looksee.auditManager.models.DomainAuditRecord;
 import com.looksee.auditManager.models.enums.AuditName;
 import com.looksee.auditManager.models.enums.ExecutionStatus;
 import com.looksee.auditManager.models.message.PageAuditMessage;
-import com.looksee.auditManager.models.message.PageBuiltMessage;
+import com.looksee.auditManager.models.message.PageAuditRunMessage;
+import com.looksee.auditManager.models.message.SinglePageBuiltMessage;
+import com.looksee.auditManager.models.message.DomainPageBuiltMessage;
 import com.looksee.auditManager.services.AuditRecordService;
 import com.looksee.auditManager.models.PageAuditRecord;
 
@@ -61,6 +63,15 @@ public class AuditController {
 	@Autowired
 	private PubSubPageAuditPublisherImpl audit_record_topic;
 	
+	/**
+	 * 
+	 * @param body
+	 * @return
+	 * @throws JsonMappingException
+	 * @throws JsonProcessingException
+	 * @throws ExecutionException
+	 * @throws InterruptedException
+	 */
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<String> receiveMessage(@RequestBody Body body) throws JsonMappingException, JsonProcessingException, ExecutionException, InterruptedException {
 		Body.Message message = body.getMessage();
@@ -69,20 +80,18 @@ public class AuditController {
         log.warn("page-built msg received = " + target);
 
 	    ObjectMapper input_mapper = new ObjectMapper();
-	    PageBuiltMessage page_created_msg = input_mapper.readValue(target, PageBuiltMessage.class);
-	    
 	    JsonMapper mapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
-	    
-		//if page built message has domain record id greater than 0 then treat as part of a domain audit
-	    if(page_created_msg.getDomainAuditRecordId() >= 0) {
-			//if page has already been audited then return success with appropriate message
+
+	    try {
+	    	DomainPageBuiltMessage domain_audit_message = input_mapper.readValue(target, DomainPageBuiltMessage.class);
+	    	//if page has already been audited then return success with appropriate message
 			//otherwise add page to page audit record and and publish page audit message to pubsub
 	    	List<AuditName> audit_list = new ArrayList<>();
 			DomainAuditRecord record = null;
 			
-			Optional<AuditRecord> opt_record = audit_record_service.findById(page_created_msg.getDomainAuditRecordId());
+			Optional<AuditRecord> opt_record = audit_record_service.findById(domain_audit_message.getDomainAuditRecordId());
 			if(opt_record.isPresent()) {
-				log.warn("looking up domain audit record with id = "+page_created_msg.getDomainAuditRecordId());
+				log.warn("looking up domain audit record with id = "+domain_audit_message.getDomainAuditRecordId());
 				record = (DomainAuditRecord)opt_record.get();
 				audit_list = record.getAuditLabels();
 			}
@@ -106,16 +115,16 @@ public class AuditController {
 				audit_list.add(AuditName.IMAGE_POLICY);
 			}
 				
-			if(!wasPageAlreadyCataloged(page_created_msg.getDomainAuditRecordId(), page_created_msg.getPageId())) {
+			if(!wasPageAlreadyCataloged(domain_audit_message.getDomainAuditRecordId(), domain_audit_message.getPageId())) {
 				//add page to domain audit record. This is how things work at the moment, so propagating forward.
 				// DO NOT DELETE UNLESS YOU HAVE UPDATED ALL LOGIC THAT THIS IMPACTS FOR AUDITS AND JOURNEY EXPANSION
 				//TODO : replace need for page to be directly associated with DomainAuditRecord for stats on front end
-				log.warn("adding page to domain audit record "+page_created_msg.getDomainAuditRecordId());
-				audit_record_service.addPageToAuditRecord(page_created_msg.getDomainAuditRecordId(), 
-														  page_created_msg.getPageId());
+				log.warn("adding page to domain audit record "+domain_audit_message.getDomainAuditRecordId());
+				audit_record_service.addPageToAuditRecord(domain_audit_message.getDomainAuditRecordId(), 
+															domain_audit_message.getPageId());
 			}
 			
-			if( !audit_record_service.wasPageAlreadyAudited(page_created_msg.getDomainAuditRecordId(), page_created_msg.getPageId())) {
+			if( !audit_record_service.wasPageAlreadyAudited(domain_audit_message.getDomainAuditRecordId(), domain_audit_message.getPageId())) {
 				
 				AuditRecord audit_record = new PageAuditRecord(ExecutionStatus.BUILDING_PAGE,
 																new HashSet<>(),
@@ -125,44 +134,48 @@ public class AuditController {
 				
 				audit_record = audit_record_service.save(audit_record);
 				log.warn("adding page audit to domain audit ");
-				audit_record_service.addPageAuditToDomainAudit(page_created_msg.getDomainAuditRecordId(),
+				audit_record_service.addPageAuditToDomainAudit(domain_audit_message.getDomainAuditRecordId(),
 																audit_record.getId());
 				
 				audit_record_service.addPageToAuditRecord(audit_record.getId(),
-														  page_created_msg.getPageId());
+															domain_audit_message.getPageId());
 				
 				
 				
 				//send message to page audit message topic
-				PageAuditMessage audit_msg = new PageAuditMessage(	page_created_msg.getAccountId(),
-																	page_created_msg.getDomainId(),
-																	page_created_msg.getDomainAuditRecordId(),
+				PageAuditRunMessage audit_msg = new PageAuditRunMessage(	domain_audit_message.getAccountId(),
 																	audit_record.getId(),
-																	page_created_msg.getPageId());
+																	domain_audit_message.getPageId());
 				
 				String audit_record_json = mapper.writeValueAsString(audit_msg);
 				log.warn("Sending PageAuditMessage to Pub/Sub = "+audit_record_json);
 				audit_record_topic.publish(audit_record_json);
 			}
 	    }
-	    else if(page_created_msg.getPageAuditRecordId() >= 0) {
-	    	//add page state to page audit record
-	    	audit_record_service.addPageToAuditRecord(page_created_msg.getPageAuditRecordId(), 
-					  								  page_created_msg.getPageId());
+	    catch(Exception e){
 	    	
-	    	//send message to audit record topic to have page audited
-	    	//send message to page audit message topic
-			PageAuditMessage audit_msg = new PageAuditMessage(	page_created_msg.getAccountId(),
-																page_created_msg.getDomainId(),
-																page_created_msg.getDomainAuditRecordId(),
-																page_created_msg.getPageAuditRecordId(),
-																page_created_msg.getPageId());
-			
-			String audit_record_json = mapper.writeValueAsString(audit_msg);
-			log.warn("Sending PageAuditMessage to Pub/Sub = "+audit_record_json);
-			audit_record_topic.publish(audit_record_json);
 	    }
-		
+	    
+	    try {
+		    SinglePageBuiltMessage page_created_msg = input_mapper.readValue(target, SinglePageBuiltMessage.class);
+
+			if(page_created_msg.getPageAuditRecordId() >= 0) {
+		    	//add page state to page audit record
+		    	audit_record_service.addPageToAuditRecord(page_created_msg.getPageAuditRecordId(), 
+						  								  page_created_msg.getPageId());
+		    	
+		    	//send message to audit record topic to have page audited
+		    	//send message to page audit message topic
+				PageAuditMessage audit_msg = new PageAuditMessage(	page_created_msg.getAccountId(),
+																	page_created_msg.getPageAuditRecordId());
+				
+				String audit_record_json = mapper.writeValueAsString(audit_msg);
+				log.warn("Sending PageAuditMessage to Pub/Sub = "+audit_record_json);
+				audit_record_topic.publish(audit_record_json);
+		    }
+	    }catch(Exception e) {
+	    	
+	    }
 		
 		//update audit record
 		//TODO : MOVE FOLLOWING LOGIC TO CLOUD RUN TO HANDLE AUDIT UPDATES

@@ -3,7 +3,7 @@ package com.looksee.auditManager.models.message;
 import com.looksee.auditManager.models.enums.BrowserType;
 import com.looksee.auditManager.models.journeys.Journey;
 
-public class DiscardedJourneyMessage extends Message {
+public class DiscardedJourneyMessage extends DomainAuditMessage {
 
 	private Journey journey;
 	private BrowserType browserType;

@@ -7,7 +7,7 @@ import com.looksee.auditManager.models.journeys.Journey;
 /**
  * 
  */
-public class VerifiedJourneyMessage extends Message {
+public class VerifiedJourneyMessage extends DomainAuditMessage {
 
 	private Journey journey;
 	private JourneyStatus status;
@@ -18,23 +18,19 @@ public class VerifiedJourneyMessage extends Message {
 	public VerifiedJourneyMessage( Journey journey, 
 								   JourneyStatus status, 
 								   BrowserType browser,
-								   long domain_id,
-								   long account_id, 
+								   long account_id,
 								   long audit_record_id)
 	{
 		setJourney(journey);
 		setStatus(status);
 		setBrowser(browser);
-		setDomainId(domain_id);
 		setAccountId(account_id);
-		setDomainAuditRecordId(audit_record_id);
 	}
 	
 	public VerifiedJourneyMessage clone(){
 		return new VerifiedJourneyMessage(	journey.clone(), 
 											getStatus(), 
 											getBrowser(), 
-											getDomainId(), 
 											getAccountId(), 
 											getDomainAuditRecordId());
 	}

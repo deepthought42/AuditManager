@@ -5,7 +5,7 @@ import com.looksee.auditManager.models.enums.JourneyStatus;
 import com.looksee.auditManager.models.journeys.Journey;
 
 
-public class JourneyMessage extends Message {
+public class JourneyMessage extends DomainAuditMessage {
 
 	private Journey journey;
 	private JourneyStatus status;
@@ -14,10 +14,8 @@ public class JourneyMessage extends Message {
 	public JourneyMessage( Journey journey, 
 						   JourneyStatus status, 
 						   BrowserType browser_type, 
-						   long domain_id, 
 						   long account_id, 
 						   long audit_record_id){
-		super(domain_id, account_id, audit_record_id);
 		setJourney(journey);
 		setStatus(status);
 		setBrowser(browser_type);
@@ -27,8 +25,7 @@ public class JourneyMessage extends Message {
 		return new JourneyMessage(journey.clone(),
 								  getStatus(), 
 								  getBrowser(), 
-								  getDomainId(),
-								  getAccountId(), 
+								  getAccountId(),
 								  getDomainAuditRecordId());
 	}
 
