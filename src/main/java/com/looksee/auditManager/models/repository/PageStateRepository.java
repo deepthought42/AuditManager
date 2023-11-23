@@ -95,4 +95,7 @@ public interface PageStateRepository extends Neo4jRepository<PageState, Long> {
 	
 	@Query("MATCH (s:Step) WITH s WHERE id(s)=$step_id MATCH (s)-[:ENDS_WITH]->(p:PageState) RETURN p")
 	public PageState getEndPageForStep(@Param("step_id") long id);
+
+	@Query("MATCH (step:LandingStep)-[:STARTS_WITH]->(ps:PageState) WHERE id(ps)=$page_id RETURN ps LIMIT 1")
+	public PageState isPageLandable(@Param("page_id") long pageId);
 }

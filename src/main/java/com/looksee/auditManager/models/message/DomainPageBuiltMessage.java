@@ -1,5 +1,8 @@
 package com.looksee.auditManager.models.message;
 
+/**
+ * Message used to indicate that a domain page has been built and data extracted
+ */
 public class DomainPageBuiltMessage extends DomainAuditMessage{
 	private long pageId;
 	private long pageAuditRecordId;
@@ -8,12 +11,10 @@ public class DomainPageBuiltMessage extends DomainAuditMessage{
 	
 	public DomainPageBuiltMessage(long account_id, 
 							long domain_audit_id,
-							long page_id,
-							long page_audit_record_id) 
+							long page_id) 
 	{
 		super(account_id, domain_audit_id);
 		setPageId(page_id);
-		setPageAuditRecordId(page_audit_record_id);
 	}
 	
 	public long getPageId() {

@@ -63,6 +63,6 @@ public interface AccountRepository extends Neo4jRepository<Account, Long> {
 	@Query("MATCH (account:Account{customer_id:$customer_id}) RETURN account")
 	public Account findByCustomerId(@Param("customer_id") String customer_id);
 	
-	@Query("MATCH (account:Account)-[:HAS]->(domain:Domain) MATCH (domain)<-[:HAS]-(audit_record:DomainAuditRecord) WHERE id(account)=$account_id AND datetime(audit_record.created_at).month=$month RETURN COUNT(audit_record)")
+	@Query("MATCH (account:Account)-[:HAS]->(domain:Domain) MATCH (domain)-[:HAS]->(audit_record:DomainAuditRecord) WHERE id(account)=$account_id AND datetime(audit_record.created_at).month=$month RETURN COUNT(audit_record)")
 	public int geDomainAuditRecordCountByMonth(@Param("account_id") long account_id, @Param("month") int month);
 }

@@ -1,7 +1,7 @@
 package com.looksee.auditManager.models.message;
 
 public class PageAuditMessage extends Message {
-	private long page_audit_id;
+	private long pageAuditId;
 	
 	public PageAuditMessage() {}
 	
@@ -13,10 +13,10 @@ public class PageAuditMessage extends Message {
 	}
 
 	public long getPageAuditId() {
-		return page_audit_id;
+		return pageAuditId;
 	}
 
 	public void setPageAuditId(long page_audit_id) {
-		this.page_audit_id = page_audit_id;
+		this.pageAuditId = page_audit_id;
 	}
 }

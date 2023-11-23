@@ -1,9 +1,7 @@
 package com.looksee.auditManager.models.message;
 
-
-import com.looksee.journeyExpander.models.enums.BrowserType;
-import com.looksee.journeyExpander.models.journeys.Journey;
-
+import com.looksee.auditManager.models.enums.BrowserType;
+import com.looksee.auditManager.models.journeys.Journey;
 
 /**
  * 

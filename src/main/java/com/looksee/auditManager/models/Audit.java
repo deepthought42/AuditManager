@@ -98,9 +98,9 @@ public class Audit extends LookseeObject {
 	 * @return string of hashCodes identifying unique fingerprint of object by the contents of the object
 	 */
 	public String generateKey() {
-		return "audit"+org.apache.commons.codec.digest.DigestUtils.sha256Hex(this.getName().toString()+this.getCategory().toString()+this.getLevel()+getPoints()+getTotalPossiblePoints()+getCreatedAt().toString());
+		return "audit"+org.apache.commons.codec.digest.DigestUtils.sha256Hex(this.getName().toString()+this.getCategory().toString()+this.getLevel().toString());
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */

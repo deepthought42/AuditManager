@@ -183,4 +183,8 @@ public class PageStateService {
 	public PageState findByDomainAudit(long domainAuditRecordId, long page_state_id) {
 		return page_state_repo.findByDomainAudit(domainAuditRecordId, page_state_id);
 	}
+
+	public boolean isPageLandable(long pageId) {
+		return page_state_repo.isPageLandable(pageId) != null;
+	}
 }

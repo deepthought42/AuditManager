@@ -11,7 +11,7 @@ public class PubSubAuditUpdatePublisherImpl extends PubSubPublisher {
     @SuppressWarnings("unused")
 	private static Logger LOG = LoggerFactory.getLogger(PubSubAuditUpdatePublisherImpl.class);
 
-    @Value("${pubsub.audit_update_topic}")
+    @Value("${pubsub.audit_update}")
     private String topic;
     
     @Override

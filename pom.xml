@@ -2,7 +2,7 @@
   	<modelVersion>4.0.0</modelVersion>
   	<groupId>com.looksee</groupId>
   	<artifactId>audit-manager</artifactId>
-  	<version>0.0.1</version>
+  	<version>0.0.2</version>
 	<packaging>jar</packaging>
 
   	<properties>
@@ -196,7 +196,11 @@
 		    <version>3.4.0</version>
 		</dependency>
 
-
+		<!-- Add Secret Manager Starter -->
+	    <dependency>
+	      <groupId>com.google.cloud</groupId>
+	      <artifactId>spring-cloud-gcp-starter-secretmanager</artifactId>
+	    </dependency>
 				
 		<!-- https://mvnrepository.com/artifact/com.google.cloud/spring-cloud-gcp-starter-storage -->
 		<dependency>
@@ -289,12 +293,6 @@
 				    <artifactId>selenium-java</artifactId>
 				</exclusion>
 	     	</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>com.looksee</groupId>
-			<artifactId>journeyExpander</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	  </dependencies>
 

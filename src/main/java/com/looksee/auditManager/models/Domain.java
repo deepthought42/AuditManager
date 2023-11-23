@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.neo4j.core.schema.Relationship;
-import org.springframework.data.neo4j.core.schema.Relationship.Direction;
 
 
 
@@ -25,7 +24,7 @@ public class Domain extends LookseeObject{
 	@Relationship(type = "HAS")
 	private List<PageState> pages;
 	
-	@Relationship(type = "HAS", direction = Direction.INCOMING)
+	@Relationship(type = "HAS")
 	private Set<DomainAuditRecord> audit_records;
 
 	@Relationship(type="USES")

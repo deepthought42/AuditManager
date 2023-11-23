@@ -1,9 +1,13 @@
 package com.looksee.utils;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -178,18 +182,6 @@ public class AuditUtils {
 		else {
 			return "needs work";
 		}
-	}
-	
-	public static boolean isAestheticsAuditComplete(Set<Audit> audits) {
-		return audits.size() == 2;
-	}
-
-	public static boolean isContentAuditComplete(Set<Audit> audits) {
-		return audits.size() == 3;
-	}
-	
-	public static boolean isInformationArchitectureAuditComplete(Set<Audit> audits) {
-		return audits.size() == 3;
 	}
 
 	/**
@@ -440,5 +432,92 @@ public class AuditUtils {
 		}
 		
 		return reading_complexity_issues / reading_complexity_total;
+	}
+
+	/**
+	 * Calculates the {@link Audit} progress based on audits completed and the total pages
+	 * @param category
+	 * @param page_count
+	 * @param audit_list
+	 * @param audit_labels
+	 * @return
+	 */
+	public static double calculateProgress(AuditCategory category, 
+											 int page_count, 
+											 Set<Audit> audit_list, 
+											 Set<AuditName> audit_labels) {
+				
+		Map<AuditName, Integer> audit_count_map = new HashMap<>();
+		Set<AuditName> category_audit_labels = getAuditLabels(category, audit_labels);
+		List<Audit> filtered_audits = audit_list.stream()
+												.filter(audit -> category.equals(audit.getCategory()))
+												.filter(audit -> category_audit_labels.contains(audit.getName()))
+												.collect(Collectors.toList());
+		
+		
+		for(Audit audit : filtered_audits) {
+			if(audit_count_map.containsKey(audit.getName())) {
+				audit_count_map.put(audit.getName(), audit_count_map.get(audit.getName())+1);
+			}
+			else {
+				audit_count_map.put(audit.getName(), 1);
+			}
+		}
+		
+		log.warn("audit count map = " +audit_count_map);
+		double total_audit_count = 0;
+		for(int count : audit_count_map.values()) {
+			total_audit_count += (double)count;
+		}
+		
+		log.warn("total audit count = "+total_audit_count);
+		total_audit_count = total_audit_count / (double)category_audit_labels.size();
+		log.warn("new total ="+total_audit_count);
+		
+		return total_audit_count / (double)page_count;
+		
+	}
+
+	/**
+	 * Retrieves the intersection between the full set of Audit Labels for a category compared with the desired set of audit labels.
+	 * If the category is unknown, then the desired set of audit labels is returned without an intersection operation performed
+	 * 
+	 * @param category
+	 * @param audit_labels
+	 * @return
+	 */
+	public static Set<AuditName> getAuditLabels(AuditCategory category, Set<AuditName> audit_labels) {
+		Set<AuditName> aesthetic_audit_labels = new HashSet<>();
+		aesthetic_audit_labels.add(AuditName.TEXT_BACKGROUND_CONTRAST);
+		aesthetic_audit_labels.add(AuditName.NON_TEXT_BACKGROUND_CONTRAST);
+		
+		Set<AuditName> content_audit_labels = new HashSet<>();
+		content_audit_labels.add(AuditName.ALT_TEXT);
+		content_audit_labels.add(AuditName.READING_COMPLEXITY);
+		content_audit_labels.add(AuditName.PARAGRAPHING);
+		content_audit_labels.add(AuditName.IMAGE_COPYRIGHT);
+		content_audit_labels.add(AuditName.IMAGE_POLICY);
+
+		Set<AuditName> info_architecture_audit_labels = new HashSet<>();
+		info_architecture_audit_labels.add(AuditName.LINKS);
+		info_architecture_audit_labels.add(AuditName.TITLES);
+		info_architecture_audit_labels.add(AuditName.ENCRYPTED);
+		info_architecture_audit_labels.add(AuditName.METADATA);
+		
+		if(AuditCategory.AESTHETICS.equals(category)) {
+			//retrieve labels that are in both the aesthetic audit labels set and the list of audit labels passed in
+			return SetUtils.intersection(aesthetic_audit_labels, audit_labels);
+		}
+		else if(AuditCategory.CONTENT.equals(category)) {
+			//retrieve labels that are in both the content audit labels set and the list of audit labels passed in
+			return SetUtils.intersection(content_audit_labels, audit_labels);
+
+		}
+		else if(AuditCategory.INFORMATION_ARCHITECTURE.equals(category)) {
+			//retrieve labels that are in both the aesthetic audit labels set and the list of audit labels passed in
+			return SetUtils.intersection(info_architecture_audit_labels, audit_labels);
+		}
+		
+		return audit_labels;
 	}
 }
