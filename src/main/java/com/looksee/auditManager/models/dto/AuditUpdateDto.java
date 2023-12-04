@@ -1,14 +1,15 @@
 package com.looksee.auditManager.models.dto;
 
+import com.looksee.auditManager.models.enums.AuditLevel;
 import com.looksee.auditManager.models.enums.ExecutionStatus;
 
 /**
  * Data transfer object for {@link Domain} object that is designed to comply with
  * the data format for browser extensions
  */
-public class PageAuditDto {
+public class AuditUpdateDto {
 	private long id;
-	private String url;
+	private AuditLevel level;
 	private double content_score;
 	private double content_progress;
 	private double info_architecture_score;
@@ -21,30 +22,29 @@ public class PageAuditDto {
 	private String message;
 	private String status;
 	
-	public PageAuditDto(){}
+	public AuditUpdateDto(){}
 
-	public PageAuditDto(
+	public AuditUpdateDto(
 			long id,
-			String url,
+			AuditLevel level,
 			double content_score,
 			double content_progress,
 			double info_architecture_score,
 			double info_architecture_progress,
 			double accessibility_score,
 			double aesthetics_score,
-			double aesthetics_progress, 
-			double data_extraction_progress,
+			double aesthetics_progress,
+			double data_extraction_progress, 
 			String message,
 			ExecutionStatus status
 	){
 		setId(id);
-		setUrl(url);
+		setLevel(level);
 		setContentScore(content_score);
 		setContentProgress(content_progress);
 		setInfoArchitectureScore(info_architecture_score);
 		setInfoArchitectureProgress(info_architecture_progress);
 		setAccessibilityScore(accessibility_score);
-		setAccessibilityProgress(accessibility_progress);
 		setAestheticsScore(aesthetics_score);
 		setAestheticsProgress(aesthetics_progress);
 		setDataExtractionProgress(data_extraction_progress);
@@ -58,14 +58,6 @@ public class PageAuditDto {
 
 	public void setId(long id) {
 		this.id = id;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
 	}
 
 	public double getContentScore() {
@@ -154,5 +146,13 @@ public class PageAuditDto {
 
 	public void setStatus(ExecutionStatus status) {
 		this.status = status.getShortName();
+	}
+
+	public AuditLevel getLevel() {
+		return level;
+	}
+
+	public void setLevel(AuditLevel level) {
+		this.level = level;
 	}	
 }

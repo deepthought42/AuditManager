@@ -46,21 +46,23 @@ import com.looksee.auditManager.models.Audit;
 import com.looksee.auditManager.models.AuditRecord;
 import com.looksee.auditManager.models.DomainAuditRecord;
 import com.looksee.auditManager.models.enums.AuditCategory;
+import com.looksee.auditManager.models.enums.AuditLevel;
 import com.looksee.auditManager.models.enums.AuditName;
 import com.looksee.auditManager.models.enums.ExecutionStatus;
 import com.looksee.auditManager.models.message.PageAuditMessage;
 import com.looksee.auditManager.models.message.SinglePageBuiltMessage;
 import com.looksee.auditManager.models.message.DomainPageBuiltMessage;
 import com.looksee.auditManager.services.AuditRecordService;
-import com.looksee.auditManager.services.AuditService;
 import com.looksee.auditManager.services.MessageBroadcaster;
 import com.looksee.auditManager.services.PageStateService;
-import com.looksee.auditManager.models.dto.PageAuditDto;
+import com.looksee.auditManager.models.dto.AuditUpdateDto;
 import com.looksee.utils.AuditUtils;
 import com.looksee.auditManager.models.PageAuditRecord;
-import com.looksee.auditManager.models.PageState;
 
-// PubsubController consumes a Pub/Sub message.
+/**
+ * Main ReST Controller for this micro-service. Expects to receive either a {@linkplain DomainPageBuiltMessage} or a {@linkplain SinglePageBuiltMessage}
+ *   and passes on information appropriately to micro-services that perform audits as well as sending an {@linkPlain AuditUpdateDto} message to the audit update topic
+ */
 @RestController
 public class AuditController {
 	private static Logger log = LoggerFactory.getLogger(AuditController.class);
@@ -73,9 +75,6 @@ public class AuditController {
 	
 	@Autowired
 	private PageStateService page_state_service;
-	
-	@Autowired
-	private AuditService audit_service;
 	
 	@Autowired
 	private MessageBroadcaster pusher;
@@ -170,6 +169,11 @@ public class AuditController {
 				String audit_record_json = mapper.writeValueAsString(audit_msg);
 				log.warn("(DomainAudit) Sending PageAuditMessage to Pub/Sub = "+audit_record_json);
 				audit_record_topic.publish(audit_record_json);
+				
+				//send message to page audit message topic
+				//TODO: Replace following logic with a message that is publishes an update message to the audit-update topic
+				AuditUpdateDto audit_dto = buildAuditUpdatedDto(domain_audit_message.getDomainAuditRecordId(), AuditLevel.DOMAIN);
+				pusher.sendAuditUpdate(Long.toString( domain_audit_message.getDomainAuditRecordId() ), audit_dto);
 			}
 			else {
 				log.warn("Page with id = "+domain_audit_message.getPageId()+" has already been sent to be audited");
@@ -194,7 +198,6 @@ public class AuditController {
 						  								  page_created_msg.getPageId());
 		    	
 		    	//send message to audit record topic to have page audited
-		    	//send message to page audit message topic
 				PageAuditMessage audit_msg = new PageAuditMessage(	page_created_msg.getAccountId(),
 																	page_created_msg.getPageAuditId());
 				
@@ -202,10 +205,10 @@ public class AuditController {
 				log.warn("(SinglePageAudit) Sending PageAuditMessage to Pub/Sub = "+page_audit_msg_json);
 				audit_record_topic.publish(page_audit_msg_json);
 				
-				PageState page = page_state_service.findById(page_created_msg.getPageId()).get();
-				//PageAuditRecord audit_record = (PageAuditRecord)audit_record_service.findById(page_created_msg.getPageAuditId()).get();
-				PageAuditDto audit_dto = builPagedAuditdDto(page_created_msg.getPageAuditId(), page.getUrl());
-				pusher.sendAuditUpdate(Long.toString( page_created_msg.getAccountId() ), audit_dto);
+		    	//send message to page audit message topic
+				//TODO: Replace following logic with a message that is publishes an update message to the audit-update topic
+				AuditUpdateDto audit_dto = buildAuditUpdatedDto(page_created_msg.getPageAuditId(), AuditLevel.PAGE);
+				pusher.sendAuditUpdate(Long.toString( page_created_msg.getPageAuditId() ), audit_dto);
 		    }
 	    }catch(Exception e) {
 	    	e.printStackTrace();
@@ -250,12 +253,14 @@ public class AuditController {
   }
 
 	/**
-	 * Creates an {@linkplain PageAuditDto} using page audit ID and the provided page_url
+	 * Creates an {@linkplain AuditUpdateDto} using page audit ID and the provided page_url
+	 * 
 	 * @param pageAuditId
-	 * @param page_url
 	 * @return
+	 * 
+	 * @pre level != null
 	 */
-	private PageAuditDto builPagedAuditdDto(long pageAuditId, String page_url) {
+	private AuditUpdateDto buildAuditUpdatedDto(long pageAuditId, AuditLevel level) {
 		//get all audits
 		Set<Audit> audits = audit_record_service.getAllAudits(pageAuditId);
 		Set<AuditName> audit_labels = new HashSet<AuditName>();
@@ -302,18 +307,18 @@ public class AuditController {
 			execution_status = ExecutionStatus.COMPLETE;
 		}
 		
-		return new PageAuditDto(pageAuditId, 
-								page_url, 
-								content_score, 
-								content_progress, 
-								info_architecture_score, 
-								info_architecture_progress, 
-								a11y_score,
-								visual_design_score,
-								visual_design_progress,
-								data_extraction_progress, 
-								message, 
-								execution_status);
+		return new AuditUpdateDto(pageAuditId,
+									level,
+									content_score, 
+									content_progress, 
+									info_architecture_score, 
+									info_architecture_progress, 
+									a11y_score,
+									visual_design_score,
+									visual_design_progress,
+									data_extraction_progress, 
+									message, 
+									execution_status);
 	}
 
 	private boolean wasPageAlreadyCataloged(long domain_audit_id, long page_id) {
