@@ -22,7 +22,6 @@ import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
@@ -42,21 +41,17 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.looksee.auditManager.gcp.PubSubPageAuditPublisherImpl;
 import com.looksee.auditManager.mapper.Body;
-import com.looksee.auditManager.models.Audit;
 import com.looksee.auditManager.models.AuditRecord;
 import com.looksee.auditManager.models.DomainAuditRecord;
-import com.looksee.auditManager.models.enums.AuditCategory;
-import com.looksee.auditManager.models.enums.AuditLevel;
 import com.looksee.auditManager.models.enums.AuditName;
 import com.looksee.auditManager.models.enums.ExecutionStatus;
 import com.looksee.auditManager.models.message.PageAuditMessage;
 import com.looksee.auditManager.models.message.SinglePageBuiltMessage;
 import com.looksee.auditManager.models.message.DomainPageBuiltMessage;
 import com.looksee.auditManager.services.AuditRecordService;
-import com.looksee.auditManager.services.MessageBroadcaster;
 import com.looksee.auditManager.services.PageStateService;
-import com.looksee.auditManager.models.dto.AuditUpdateDto;
-import com.looksee.utils.AuditUtils;
+import com.looksee.auditManager.gcp.PubSubAuditUpdatePublisherImpl;
+import com.looksee.auditManager.models.message.AuditProgressUpdate;
 import com.looksee.auditManager.models.PageAuditRecord;
 
 /**
@@ -77,7 +72,7 @@ public class AuditController {
 	private PageStateService page_state_service;
 	
 	@Autowired
-	private MessageBroadcaster pusher;
+	private PubSubAuditUpdatePublisherImpl audit_update_topic;
 	
 	/**
 	 * 
@@ -171,9 +166,15 @@ public class AuditController {
 				audit_record_topic.publish(audit_record_json);
 				
 				//send message to page audit message topic
+				AuditProgressUpdate audit_update = new AuditProgressUpdate(domain_audit_message.getAccountId(),
+																			domain_audit_message.getDomainAuditRecordId(),
+																			"Starting new page audit");
+					
+				String audit_update_json = mapper.writeValueAsString(audit_update);
+				audit_update_topic.publish(audit_update_json);
 				//TODO: Replace following logic with a message that is publishes an update message to the audit-update topic
-				AuditUpdateDto audit_dto = buildAuditUpdatedDto(domain_audit_message.getDomainAuditRecordId(), AuditLevel.DOMAIN);
-				pusher.sendAuditUpdate(Long.toString( domain_audit_message.getDomainAuditRecordId() ), audit_dto);
+				//AuditUpdateDto audit_dto = buildAuditUpdatedDto(domain_audit_message.getDomainAuditRecordId(), AuditLevel.DOMAIN);
+				//pusher.sendAuditUpdate(Long.toString( domain_audit_message.getDomainAuditRecordId() ), audit_dto);
 			}
 			else {
 				log.warn("Page with id = "+domain_audit_message.getPageId()+" has already been sent to be audited");
@@ -192,7 +193,7 @@ public class AuditController {
 	    	log.warn("Received single page built message");
 		    SinglePageBuiltMessage page_created_msg = input_mapper.readValue(target, SinglePageBuiltMessage.class);
 		    
-			if(page_created_msg.getPageAuditId() >= 0) {
+			if(page_created_msg.getPageAuditId() >= 0 && !audit_record_service.wasSinglePageAlreadyAudited(page_created_msg.getPageAuditId(), page_created_msg.getPageId())) {
 		    	//add page state to page audit record
 		    	audit_record_service.addPageToAuditRecord(page_created_msg.getPageAuditId(), 
 						  								  page_created_msg.getPageId());
@@ -206,9 +207,16 @@ public class AuditController {
 				audit_record_topic.publish(page_audit_msg_json);
 				
 		    	//send message to page audit message topic
+				AuditProgressUpdate audit_update = new AuditProgressUpdate(audit_msg.getAccountId(),
+																			audit_msg.getPageAuditId(),
+																			"Data extraction complete!");
+				
+				String audit_update_json = mapper.writeValueAsString(audit_update);
+				audit_update_topic.publish(audit_update_json);
+
 				//TODO: Replace following logic with a message that is publishes an update message to the audit-update topic
-				AuditUpdateDto audit_dto = buildAuditUpdatedDto(page_created_msg.getPageAuditId(), AuditLevel.PAGE);
-				pusher.sendAuditUpdate(Long.toString( page_created_msg.getPageAuditId() ), audit_dto);
+				//AuditUpdateDto audit_dto = buildAuditUpdatedDto(page_created_msg.getPageAuditId(), AuditLevel.PAGE);
+				//pusher.sendAuditUpdate(Long.toString( page_created_msg.getPageAuditId() ), audit_dto);
 		    }
 	    }catch(Exception e) {
 	    	e.printStackTrace();
@@ -252,92 +260,9 @@ public class AuditController {
 		return new ResponseEntity<String>("Successfully sent message to audit manager", HttpStatus.OK);
   }
 
-	/**
-	 * Creates an {@linkplain AuditUpdateDto} using page audit ID and the provided page_url
-	 * 
-	 * @param pageAuditId
-	 * @return
-	 * 
-	 * @pre level != null
-	 */
-	private AuditUpdateDto buildAuditUpdatedDto(long pageAuditId, AuditLevel level) {
-		//get all audits
-		Set<Audit> audits = audit_record_service.getAllAudits(pageAuditId);
-		Set<AuditName> audit_labels = new HashSet<AuditName>();
-		audit_labels.add(AuditName.TEXT_BACKGROUND_CONTRAST);
-		audit_labels.add(AuditName.NON_TEXT_BACKGROUND_CONTRAST);
-		audit_labels.add(AuditName.TITLES);
-		audit_labels.add(AuditName.IMAGE_COPYRIGHT);
-		audit_labels.add(AuditName.IMAGE_POLICY);
-		audit_labels.add(AuditName.LINKS);
-		audit_labels.add(AuditName.ALT_TEXT);
-		audit_labels.add(AuditName.METADATA);
-		audit_labels.add(AuditName.READING_COMPLEXITY);
-		audit_labels.add(AuditName.PARAGRAPHING);
-		audit_labels.add(AuditName.ENCRYPTED);
-		//count audits for each category
-		//calculate content score
-		//calculate aesthetics score
-		//calculate information architecture score
-		double visual_design_progress = AuditUtils.calculateProgress(AuditCategory.AESTHETICS, 
-																 1, 
-																 audits, 
-																 AuditUtils.getAuditLabels(AuditCategory.AESTHETICS, audit_labels));
-		double content_progress = AuditUtils.calculateProgress(AuditCategory.CONTENT, 
-																1, 
-																audits, 
-																audit_labels);
-		double info_architecture_progress = AuditUtils.calculateProgress(AuditCategory.INFORMATION_ARCHITECTURE, 
-																		1, 
-																		audits, 
-																		audit_labels);
-
-		double content_score = AuditUtils.calculateScoreByCategory(audits, AuditCategory.CONTENT);
-		double info_architecture_score = AuditUtils.calculateScoreByCategory(audits, AuditCategory.INFORMATION_ARCHITECTURE);
-		double visual_design_score = AuditUtils.calculateScoreByCategory(audits, AuditCategory.AESTHETICS);
-		double a11y_score = AuditUtils.calculateScoreByCategory(audits, AuditCategory.ACCESSIBILITY);
-
-		double data_extraction_progress = 1;
-		String message = "";
-		ExecutionStatus execution_status = ExecutionStatus.UNKNOWN;
-		if(visual_design_progress < 1 || content_progress < 1 || visual_design_progress < 1) {
-			execution_status = ExecutionStatus.IN_PROGRESS;
-		}
-		else {
-			execution_status = ExecutionStatus.COMPLETE;
-		}
-		
-		return new AuditUpdateDto(pageAuditId,
-									level,
-									content_score, 
-									content_progress, 
-									info_architecture_score, 
-									info_architecture_progress, 
-									a11y_score,
-									visual_design_score,
-									visual_design_progress,
-									data_extraction_progress, 
-									message, 
-									execution_status);
-	}
 
 	private boolean wasPageAlreadyCataloged(long domain_audit_id, long page_id) {
 		AuditRecord record = audit_record_service.findPageWithId(domain_audit_id, page_id);
 		return record != null;
 	}
-	
-  /*
-  public void publishMessage(String messageId, Map<String, String> attributeMap, String message) throws ExecutionException, InterruptedException {
-      log.info("Sending Message to the topic:::");
-      PubsubMessage pubsubMessage = PubsubMessage.newBuilder()
-              .putAllAttributes(attributeMap)
-              .setData(ByteString.copyFromUtf8(message))
-              .setMessageId(messageId)
-              .build();
-
-      pubSubPublisherImpl.publish(pubsubMessage);
-  }
-  */
 }
-// [END run_pubsub_handler]
-// [END cloudrun_pubsub_handler]

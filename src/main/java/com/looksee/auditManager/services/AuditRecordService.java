@@ -230,14 +230,6 @@ public class AuditRecordService {
 		return audit_record_repo.getMostRecentPageAuditRecord(url);
 	}
 
-	@Deprecated
-	public PageState getPageStateForAuditRecord(String page_audit_key) {
-		assert page_audit_key != null;
-		assert !page_audit_key.isEmpty();
-		
-		return audit_record_repo.getPageStateForAuditRecord(page_audit_key);
-	}
-
 	public Set<Audit> getAllContentAuditsForDomainRecord(long id) {
 		return audit_repo.getAllContentAuditsForDomainRecord(id);
 	}
@@ -371,21 +363,15 @@ public class AuditRecordService {
 	 * @param current_url
 	 * @return
 	 */
-	public PageState findPageWithUrl(long audit_record_id, String url) {
-		return audit_record_repo.findPageWithUrl(audit_record_id, url);
-	}
-	
-	/**
-	 * Retrieves {@link PageState} with given URL for {@link DomainAuditRecord}  
-	 * @param audit_record_id
-	 * @param current_url
-	 * @return
-	 */
 	public AuditRecord findPageWithId(long audit_record_id, long page_id) {
 		return audit_record_repo.findPageWithId(audit_record_id, page_id);
 	}
 
 	public boolean wasPageAlreadyAudited(long domainAuditRecordId, long pageId) {
 		return audit_record_repo.wasPageAlreadyAudited(domainAuditRecordId, pageId) != null;
+	}
+	
+	public boolean wasSinglePageAlreadyAudited(long pageAuditRecordId, long pageId) {
+		return audit_record_repo.wasSinglePageAlreadyAudited(pageAuditRecordId, pageId) != null;
 	}
 }
