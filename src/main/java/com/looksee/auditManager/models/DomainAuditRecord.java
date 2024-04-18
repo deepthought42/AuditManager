@@ -2,7 +2,6 @@ package com.looksee.auditManager.models;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -43,7 +42,7 @@ public class DomainAuditRecord extends AuditRecord {
 	 * @pre audit_stats != null;
 	 */
 	public DomainAuditRecord(ExecutionStatus status, 
-							List<AuditName> audit_list) {
+							Set<AuditName> audit_list) {
 		super();
 		assert status != null;
 		

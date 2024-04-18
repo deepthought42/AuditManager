@@ -1,6 +1,5 @@
 package com.looksee.auditManager;
 
-import java.util.ArrayList;
 /*
  * Copyright 2019 Google LLC
  *
@@ -20,8 +19,8 @@ import java.util.ArrayList;
 // [START run_pubsub_handler]
 import java.util.Base64;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
@@ -39,20 +38,20 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.looksee.auditManager.gcp.PubSubAuditUpdatePublisherImpl;
 import com.looksee.auditManager.gcp.PubSubPageAuditPublisherImpl;
 import com.looksee.auditManager.mapper.Body;
 import com.looksee.auditManager.models.AuditRecord;
 import com.looksee.auditManager.models.DomainAuditRecord;
+import com.looksee.auditManager.models.PageAuditRecord;
 import com.looksee.auditManager.models.enums.AuditName;
 import com.looksee.auditManager.models.enums.ExecutionStatus;
+import com.looksee.auditManager.models.message.AuditProgressUpdate;
+import com.looksee.auditManager.models.message.DomainPageBuiltMessage;
 import com.looksee.auditManager.models.message.PageAuditMessage;
 import com.looksee.auditManager.models.message.SinglePageBuiltMessage;
-import com.looksee.auditManager.models.message.DomainPageBuiltMessage;
 import com.looksee.auditManager.services.AuditRecordService;
 import com.looksee.auditManager.services.PageStateService;
-import com.looksee.auditManager.gcp.PubSubAuditUpdatePublisherImpl;
-import com.looksee.auditManager.models.message.AuditProgressUpdate;
-import com.looksee.auditManager.models.PageAuditRecord;
 
 /**
  * Main ReST Controller for this micro-service. Expects to receive either a {@linkplain DomainPageBuiltMessage} or a {@linkplain SinglePageBuiltMessage}
@@ -97,33 +96,32 @@ public class AuditController {
 	    	DomainPageBuiltMessage domain_audit_message = input_mapper.readValue(target, DomainPageBuiltMessage.class);
 	    	//if page has already been audited then return success with appropriate message
 			//otherwise add page to page audit record and and publish page audit message to pubsub
-	    	List<AuditName> audit_list = new ArrayList<>();
+	    	Set<AuditName> audit_Names = new HashSet<>();
 			DomainAuditRecord record = null;
 			
 			Optional<AuditRecord> opt_record = audit_record_service.findById(domain_audit_message.getDomainAuditRecordId());
 			if(opt_record.isPresent()) {
 				log.warn("looking up domain audit record with id = "+domain_audit_message.getDomainAuditRecordId());
 				record = (DomainAuditRecord)opt_record.get();
-				audit_list = record.getAuditLabels();
+				audit_Names = record.getAuditLabels();
 			}
 			else {
-				audit_list = new ArrayList<>();
 				//VISUAL DESIGN AUDIT
-				audit_list.add(AuditName.TEXT_BACKGROUND_CONTRAST);
-				audit_list.add(AuditName.NON_TEXT_BACKGROUND_CONTRAST);
+				audit_Names.add(AuditName.TEXT_BACKGROUND_CONTRAST);
+				audit_Names.add(AuditName.NON_TEXT_BACKGROUND_CONTRAST);
 				
 				//INFO ARCHITECTURE AUDITS
-				audit_list.add(AuditName.LINKS);
-				audit_list.add(AuditName.TITLES);
-				audit_list.add(AuditName.ENCRYPTED);
-				audit_list.add(AuditName.METADATA);
+				audit_Names.add(AuditName.LINKS);
+				audit_Names.add(AuditName.TITLES);
+				audit_Names.add(AuditName.ENCRYPTED);
+				audit_Names.add(AuditName.METADATA);
 				
 				//CONTENT AUDIT
-				audit_list.add(AuditName.ALT_TEXT);
-				audit_list.add(AuditName.READING_COMPLEXITY);
-				audit_list.add(AuditName.PARAGRAPHING);
-				audit_list.add(AuditName.IMAGE_COPYRIGHT);
-				audit_list.add(AuditName.IMAGE_POLICY);
+				audit_Names.add(AuditName.ALT_TEXT);
+				audit_Names.add(AuditName.READING_COMPLEXITY);
+				audit_Names.add(AuditName.PARAGRAPHING);
+				audit_Names.add(AuditName.IMAGE_COPYRIGHT);
+				audit_Names.add(AuditName.IMAGE_POLICY);
 			}
 				
 			if(!wasPageAlreadyCataloged(domain_audit_message.getDomainAuditRecordId(), domain_audit_message.getPageId())) {
@@ -147,7 +145,7 @@ public class AuditController {
 																new HashSet<>(),
 																null,
 																true, 
-																audit_list);
+																audit_Names);
 				
 				audit_record = audit_record_service.save(audit_record);
 				log.warn("adding page audit to domain audit "+audit_record.getId());

@@ -1,7 +1,6 @@
 package com.looksee.auditManager.models;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.neo4j.core.schema.Node;
@@ -46,7 +45,7 @@ public class PageAuditRecord extends AuditRecord {
 			Set<Audit> audits, 
 			PageState page_state, 
 			boolean is_part_of_domain_audit, 
-			List<AuditName> audit_list
+			Set<AuditName> audit_list
 	) {
 		assert audits != null;
 		assert status != null;
