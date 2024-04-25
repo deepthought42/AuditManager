@@ -83,7 +83,9 @@ public class AuditController {
 	 * @throws InterruptedException
 	 */
 	@RequestMapping(value = "/", method = RequestMethod.POST)
-	public ResponseEntity<String> receiveMessage(@RequestBody Body body) throws JsonMappingException, JsonProcessingException, ExecutionException, InterruptedException {
+	public ResponseEntity<String> receiveMessage(@RequestBody Body body) 
+		throws JsonMappingException, JsonProcessingException, ExecutionException, InterruptedException 
+	{
 		Body.Message message = body.getMessage();
 		String data = message.getData();
 	    String target = !data.isEmpty() ? new String(Base64.getDecoder().decode(data)) : "";
@@ -94,6 +96,7 @@ public class AuditController {
 
 	    try {
 	    	DomainPageBuiltMessage domain_audit_message = input_mapper.readValue(target, DomainPageBuiltMessage.class);
+			log.warn("Received domain page build message");
 	    	//if page has already been audited then return success with appropriate message
 			//otherwise add page to page audit record and and publish page audit message to pubsub
 	    	Set<AuditName> audit_Names = new HashSet<>();
@@ -177,9 +180,12 @@ public class AuditController {
 			else {
 				log.warn("Page with id = "+domain_audit_message.getPageId()+" has already been sent to be audited");
 			}
+			return new ResponseEntity<String>("Successfully sent message to audit manager", HttpStatus.OK);
 	    }
 	    catch(Exception e){
-	    	
+	    	log.error("Error occurred while mapping to DomainPageBuiltMessage");
+			log.error("message : "+target);
+			e.printStackTrace();
 	    }
 	    
 	    /****************
