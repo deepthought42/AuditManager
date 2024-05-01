@@ -1,39 +1,51 @@
 package com.looksee.auditManager.models.message;
 
+import com.looksee.auditManager.models.enums.AuditCategory;
+import com.looksee.auditManager.models.enums.AuditLevel;
+
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Intended to contain information about progress an audit
  */
 public class AuditProgressUpdate extends Message {
-	private long audit_record_id;
+	@Getter
+	@Setter
+	private long pageAuditId;
+	
+	@Getter
+	@Setter
+	private AuditCategory category;
+	
+	@Getter
+	@Setter
+	private AuditLevel level;
+	
+	@Getter
+	@Setter
+	private double progress;
+	
+	@Getter
+	@Setter
 	private String message;
 	
 	public AuditProgressUpdate() {	}
 	
 	public AuditProgressUpdate(
 			long account_id,
-			long audit_record_id,
-			String message
+			double progress,
+			String message,
+			AuditCategory category,
+			AuditLevel level,
+			long page_audit_id
 	) {
 		super(account_id);
+		setProgress(progress);
 		setMessage(message);
-		setAuditRecordId(audit_record_id);
-	}
-	
-	/* GETTERS / SETTERS */
-	public String getMessage() {
-		return message;
-	}
-	
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
-	public long getAuditRecordId() {
-		return audit_record_id;
-	}
-
-	public void setAuditRecordId(long audit_record_id) {
-		this.audit_record_id = audit_record_id;
+		setCategory(category);
+		setLevel(level);
+		setPageAuditId(page_audit_id);
 	}
 }
 

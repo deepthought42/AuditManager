@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.looksee.auditManager.gcp.PubSubAuditUpdatePublisherImpl;
 import com.looksee.auditManager.gcp.PubSubPageAuditPublisherImpl;
 import com.looksee.auditManager.mapper.Body;
 import com.looksee.auditManager.models.AuditRecord;
@@ -29,7 +28,6 @@ import com.looksee.auditManager.models.DomainAuditRecord;
 import com.looksee.auditManager.models.PageAuditRecord;
 import com.looksee.auditManager.models.enums.AuditName;
 import com.looksee.auditManager.models.enums.ExecutionStatus;
-import com.looksee.auditManager.models.message.AuditProgressUpdate;
 import com.looksee.auditManager.models.message.DomainPageBuiltMessage;
 import com.looksee.auditManager.models.message.PageAuditMessage;
 import com.looksee.auditManager.models.message.SinglePageBuiltMessage;
@@ -52,9 +50,6 @@ public class AuditController {
 	
 	@Autowired
 	private PageStateService page_state_service;
-	
-	@Autowired
-	private PubSubAuditUpdatePublisherImpl audit_update_topic;
 	
 	/**
 	 * 
@@ -151,12 +146,17 @@ public class AuditController {
 				audit_record_topic.publish(audit_record_json);
 				
 				//send message to page audit message topic
+				/*
 				AuditProgressUpdate audit_update = new AuditProgressUpdate(domain_audit_message.getAccountId(),
-																			domain_audit_message.getDomainAuditRecordId(),
-																			"Starting new page audit");
+																			0.0,
+																			"Starting new page audit",
+																			AuditCategory.CONTENT,
+																			AuditLevel.DOMAIN,
+																			audit_record.getId());
 					
 				String audit_update_json = mapper.writeValueAsString(audit_update);
 				audit_update_topic.publish(audit_update_json);
+				 */
 				//TODO: Replace following logic with a message that is publishes an update message to the audit-update topic
 				//AuditUpdateDto audit_dto = buildAuditUpdatedDto(domain_audit_message.getDomainAuditRecordId(), AuditLevel.DOMAIN);
 				//pusher.sendAuditUpdate(Long.toString( domain_audit_message.getDomainAuditRecordId() ), audit_dto);
@@ -195,12 +195,14 @@ public class AuditController {
 				audit_record_topic.publish(page_audit_msg_json);
 				
 		    	//send message to page audit message topic
+				/*
 				AuditProgressUpdate audit_update = new AuditProgressUpdate(audit_msg.getAccountId(),
 																			audit_msg.getPageAuditId(),
 																			"Data extraction complete!");
 				
 				String audit_update_json = mapper.writeValueAsString(audit_update);
 				audit_update_topic.publish(audit_update_json);
+				*/
 
 				//TODO: Replace following logic with a message that is publishes an update message to the audit-update topic
 				//AuditUpdateDto audit_dto = buildAuditUpdatedDto(page_created_msg.getPageAuditId(), AuditLevel.PAGE);
