@@ -11,12 +11,12 @@ src/main/resources/application.conf
 src/main/resources/application.properties
 
 src/main/resources/application.properties.prod
+src/main/resources/application.properties.stage
 
 src/main/resources/application.yml
 
-*.properties
-
 src/main/resources/auth0.properties.prod
+src/main/resources/auth0.properties.stage
 
 GCP-MyFirstProject-1c31159db52c.json
 

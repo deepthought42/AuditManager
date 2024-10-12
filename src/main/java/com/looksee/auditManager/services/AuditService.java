@@ -17,10 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.looksee.auditManager.models.enums.AuditName;
-import com.looksee.auditManager.models.enums.AuditSubcategory;
-import com.looksee.auditManager.models.enums.ObservationType;
-import com.looksee.auditManager.models.repository.AuditRepository;
 import com.looksee.auditManager.models.Audit;
 import com.looksee.auditManager.models.ElementState;
 import com.looksee.auditManager.models.ElementStateIssueMessage;
@@ -30,6 +26,10 @@ import com.looksee.auditManager.models.PageStateAudits;
 import com.looksee.auditManager.models.SimpleElement;
 import com.looksee.auditManager.models.SimplePage;
 import com.looksee.auditManager.models.UXIssueMessage;
+import com.looksee.auditManager.models.enums.AuditName;
+import com.looksee.auditManager.models.enums.AuditSubcategory;
+import com.looksee.auditManager.models.enums.ObservationType;
+import com.looksee.auditManager.models.repository.AuditRepository;
 
 import io.github.resilience4j.retry.annotation.Retry;
 
@@ -131,10 +131,10 @@ public class AuditService {
 			//load page state by url
 			PageState page_state = page_state_service.findByUrl(url);
 			SimplePage simple_page = new SimplePage(
-											page_state.getUrl(), 
-											page_state.getViewportScreenshotUrl(), 
-											page_state.getFullPageScreenshotUrlOnload(), 
-											page_state.getFullPageScreenshotUrlComposite(), 
+											page_state.getUrl(),
+											page_state.getViewportScreenshotUrl(),
+											page_state.getFullPageScreenshotUrl(),
+											page_state.getFullPageScreenshotUrl(),
 											page_state.getFullPageWidth(),
 											page_state.getFullPageHeight(),
 											page_state.getSrc(), 

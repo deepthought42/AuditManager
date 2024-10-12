@@ -10,11 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.looksee.auditManager.models.enums.AuditCategory;
-import com.looksee.auditManager.models.enums.ExecutionStatus;
-import com.looksee.auditManager.models.repository.AuditRecordRepository;
-import com.looksee.auditManager.models.repository.AuditRepository;
-import com.looksee.auditManager.services.AuditRecordService;
 import com.looksee.auditManager.models.Audit;
 import com.looksee.auditManager.models.AuditRecord;
 import com.looksee.auditManager.models.DesignSystem;
@@ -23,6 +18,10 @@ import com.looksee.auditManager.models.Label;
 import com.looksee.auditManager.models.PageAuditRecord;
 import com.looksee.auditManager.models.PageState;
 import com.looksee.auditManager.models.UXIssueMessage;
+import com.looksee.auditManager.models.enums.AuditCategory;
+import com.looksee.auditManager.models.enums.ExecutionStatus;
+import com.looksee.auditManager.models.repository.AuditRecordRepository;
+import com.looksee.auditManager.models.repository.AuditRepository;
 
 import io.github.resilience4j.retry.annotation.Retry;
 
@@ -343,15 +342,12 @@ public class AuditRecordService {
 
 		if(AuditCategory.CONTENT.equals(category)) {
 			audit_record.setContentAuditProgress( progress );
-			audit_record.setContentAuditMsg( message);
 		}
 		else if(AuditCategory.AESTHETICS.equals(category)) {
 			audit_record.setAestheticAuditProgress( progress);
-			audit_record.setAestheticMsg(message);
 		}
 		else if(AuditCategory.INFORMATION_ARCHITECTURE.equals(category)) {
 			audit_record.setInfoArchitectureAuditProgress( progress );
-			audit_record.setInfoArchMsg(message);
 		}
 		
 		return save(audit_record, account_id, domain_id);

@@ -18,7 +18,6 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.codec.binary.Hex;
-import org.openimaj.image.analysis.colour.CIEDE2000;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,29 +46,6 @@ public class ImageUtils {
         g2d.dispose();
         return resized;
     }
-	 
-	/**
-	 * Calculate the colour difference value between two colours in lab space.
-	 * @param lab1 first colour
-	 * @param lab2 second colour
-	 * @return the CIE 2000 colour difference
-	 */
-	public static float calculateDeltaE(float [] lab1, float[] lab2) {
-		return (float) CIEDE2000.calculateDeltaE(lab1[0],lab1[1],lab1[2],lab2[0],lab2[1],lab2[2]);
-	}
-	
-	/**
-	 * Calculate the colour difference value between two colours in lab space.
-	 * @param lab1 first colour
-	 * @param lab2 second colour
-	 * @return the CIE 2000 colour difference
-	 */
-	public static float calculateDeltaE(ColorData color1, ColorData color2) {
-		int[] lab1 = rgb2lab(color1.getRed(), color1.getGreen(), color1.getBlue());
-		int[] lab2 = rgb2lab(color2.getRed(), color2.getGreen(), color2.getBlue());
-
-		return (float) CIEDE2000.calculateDeltaE(lab1[0],lab1[1],lab1[2],lab2[0],lab2[1],lab2[2]);
-	}
 	
 	public static int[] rgb2lab(int R, int G, int B) {
 	    //http://www.brucelindbloom.com

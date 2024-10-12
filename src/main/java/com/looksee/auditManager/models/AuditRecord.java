@@ -3,6 +3,7 @@ package com.looksee.auditManager.models;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.neo4j.core.schema.Node;
@@ -12,34 +13,30 @@ import com.looksee.auditManager.models.enums.AuditName;
 import com.looksee.auditManager.models.enums.ExecutionStatus;
 
 /**
- * Record detailing an set of {@link Audit audits}.
+ * Record detailing an set of {@link Audit audits} and the outcomes of those
+ *  audits. Outcomes include progress of audits and final scores of audits 
  */
 @Node
 public class AuditRecord extends LookseeObject {
 	private String url;
-	
 	private String status;
 	private String statusMessage;
 	private String level;
-	private LocalDateTime startTime;
-	private LocalDateTime endTime;
-	private double contentAuditProgress;
-	private String contentAuditMsg;
-	
-	private double infoArchitectureAuditProgress;
-	private String infoArchMsg;
-	
-	private double aestheticAuditProgress;
-	private String aestheticMsg;
-	
-	private double dataExtractionProgress;
-	private String dataExtractionMsg;
-
 	private String targetUserAge;
 	private String targetUserEducation;
-	
-	private List<AuditName> auditLabels;
 
+	private LocalDateTime startTime;
+	private LocalDateTime endTime;
+	
+	private double contentAuditProgress;
+	private double contentAuditScore;
+	private double infoArchitectureAuditProgress;
+	private double infoArchScore;
+	private double aestheticAuditProgress;
+	private double aestheticScore;
+	private double dataExtractionProgress;
+
+	private Set<AuditName> auditLabels;
 
 	//DESIGN SYSTEM VALUES
 	private List<String> colors;
@@ -51,33 +48,45 @@ public class AuditRecord extends LookseeObject {
 		setStatusMessage("");
 		setLevel(AuditLevel.UNKNOWN);
 		setContentAuditProgress(0.0);
-		setContentAuditMsg("");
+		setContentAuditScore(0.0);
 		setInfoArchitectureAuditProgress(0.0);
-		setInfoArchMsg("");
+		setInfoArchScore(0.0);
 		setAestheticAuditProgress(0.0);
-		setAestheticMsg("");
+		setAestheticScore(0.0);
 		setDataExtractionProgress(0.0);
-		setDataExtractionMsg("");
 		setColors(new ArrayList<String>());
 	}
 	
 	/**
 	 * Constructor
-	 * @param level TODO
 	 * 
+	 * @param id
+	 * @param status
+	 * @param level
+	 * @param key
+	 * @param startTime
+	 * @param aestheticScore
+	 * @param aestheticAuditProgress
+	 * @param contentAuditScore
+	 * @param contentAuditProgress
+	 * @param infoArchScore
+	 * @param infoArchAuditProgress
+	 * @param dataExtractionProgress
+	 * @param created_at
+	 * @param endTime
+	 * @param url
 	 */
 	public AuditRecord(long id, 
 					   ExecutionStatus status, 
 					   AuditLevel level, 
 					   String key, 
 					   LocalDateTime startTime,
-					   String aestheticMsg, 
+					   double aestheticScore, 
 					   double aestheticAuditProgress, 
-					   String contentAuditMsg, 
+					   double contentAuditScore, 
 					   double contentAuditProgress,
-					   String infoArchMsg, 
+					   double infoArchScore, 
 					   double infoArchAuditProgress, 
-					   String dataExtractionMsg, 
 					   double dataExtractionProgress,
 					   LocalDateTime created_at, 
 					   LocalDateTime endTime, 
@@ -89,12 +98,11 @@ public class AuditRecord extends LookseeObject {
 		setKey(key);
 		setStartTime(endTime);
 		setAestheticAuditProgress(dataExtractionProgress);
-		setAestheticMsg(aestheticMsg);
-		setContentAuditMsg(contentAuditMsg);
+		setAestheticScore(aestheticScore);
+		setContentAuditScore(contentAuditScore);
 		setContentAuditProgress(contentAuditProgress);
-		setInfoArchMsg(infoArchMsg);
+		setInfoArchScore(infoArchScore);
 		setInfoArchitectureAuditProgress(infoArchAuditProgress);
-		setDataExtractionMsg(dataExtractionMsg);
 		setDataExtractionProgress(dataExtractionProgress);
 		setCreatedAt(created_at);
 		setEndTime(endTime);
@@ -162,28 +170,28 @@ public class AuditRecord extends LookseeObject {
 		this.aestheticAuditProgress = aesthetic_audit_progress;
 	}
 
-	public String getContentAuditMsg() {
-		return contentAuditMsg;
+	public double getContentAuditScore() {
+		return contentAuditScore;
 	}
 
-	public void setContentAuditMsg(String content_audit_msg) {
-		this.contentAuditMsg = content_audit_msg;
+	public void setContentAuditScore(double content_audit_score) {
+		this.contentAuditScore = content_audit_score;
 	}
 	
-	public String getInfoArchMsg() {
-		return infoArchMsg;
+	public double getInfoArchScore() {
+		return infoArchScore;
 	}
 
-	public void setInfoArchMsg(String info_arch_msg) {
-		this.infoArchMsg = info_arch_msg;
+	public void setInfoArchScore(double info_arch_score) {
+		this.infoArchScore = info_arch_score;
 	}
 
-	public String getAestheticMsg() {
-		return aestheticMsg;
+	public double getAestheticScore() {
+		return aestheticScore;
 	}
 
-	public void setAestheticMsg(String aesthetic_msg) {
-		this.aestheticMsg = aesthetic_msg;
+	public void setAestheticScore(double aesthetic_score) {
+		this.aestheticScore = aesthetic_score;
 	}
 
 	public double getDataExtractionProgress() {
@@ -192,14 +200,6 @@ public class AuditRecord extends LookseeObject {
 
 	public void setDataExtractionProgress(double data_extraction_progress) {
 		this.dataExtractionProgress = data_extraction_progress;
-	}
-
-	public String getDataExtractionMsg() {
-		return dataExtractionMsg;
-	}
-
-	public void setDataExtractionMsg(String data_extraction_msg) {
-		this.dataExtractionMsg = data_extraction_msg;
 	}
 
 	public String getTargetUserAge() {
@@ -226,11 +226,11 @@ public class AuditRecord extends LookseeObject {
 		this.statusMessage = status_message;
 	}
 
-	public List<AuditName> getAuditLabels() {
+	public Set<AuditName> getAuditLabels() {
 		return auditLabels;
 	}
 
-	public void setAuditLabels(List<AuditName> auditLabels) {
+	public void setAuditLabels(Set<AuditName> auditLabels) {
 		this.auditLabels = auditLabels;
 	}
 	
@@ -253,13 +253,12 @@ public class AuditRecord extends LookseeObject {
 							   getLevel(),
 							   getKey(),
 							   getStartTime(),
-							   getAestheticMsg(), 
+							   getAestheticScore(), 
 							   getAestheticAuditProgress(), 
-							   getContentAuditMsg(), 
+							   getContentAuditScore(), 
 							   getContentAuditProgress(), 
-							   getInfoArchMsg(), 
+							   getInfoArchScore(), 
 							   getInfoArchitechtureAuditProgress(),
-							   getDataExtractionMsg(), 
 							   getDataExtractionProgress(), 
 							   getCreatedAt(), 
 							   getEndTime(),
