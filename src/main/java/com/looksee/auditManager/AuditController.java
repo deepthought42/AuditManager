@@ -123,7 +123,7 @@ public class AuditController {
 				AuditRecord audit_record = new PageAuditRecord(ExecutionStatus.BUILDING_PAGE,
 																new HashSet<>(),
 																null,
-																true, 
+																true,
 																auditNames,
 																url);
 				
