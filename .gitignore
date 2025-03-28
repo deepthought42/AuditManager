@@ -1,23 +1,17 @@
 /target/
+/node_modules/
 
 *.p12
-
 *.xlsx
 
+
 gmail_credentials.json
+GCP-MyFirstProject-1c31159db52c.json
 
 src/main/resources/application.conf
 
-src/main/resources/application.properties
+*.prod
+*.stage
 
-src/main/resources/application.properties.prod
-src/main/resources/application.properties.stage
-
-src/main/resources/application.yml
-
-src/main/resources/auth0.properties.prod
-src/main/resources/auth0.properties.stage
-
-GCP-MyFirstProject-1c31159db52c.json
 
 LOG_FILE_IS_UNDEFINED
