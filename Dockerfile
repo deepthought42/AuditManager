@@ -20,9 +20,8 @@ FROM adoptopenjdk/openjdk14
 #FROM eclipse-temurin:17-jre
 
 # Copy the built JAR file from the previous stage
-COPY --from=build /app/target/*.jar app.jar
-#COPY GCP-MyFirstProject-1c31159db52c.json GCP-MyFirstProject-1c31159db52c.json
-#COPY gmail_credentials.json /etc/creds/gmail_credentials.json
+COPY --from=build /app/target/*.jar app.JAR
+
 EXPOSE 443
 EXPOSE 80
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-ea","-jar", "app.jar"]
