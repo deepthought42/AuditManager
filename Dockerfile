@@ -2,7 +2,6 @@
 FROM maven:3.9.6-eclipse-temurin-17 as build
 
 # Set the working directory inside the container
-# Set the working directory inside the container
 WORKDIR /app
 
 # Copy the pom.xml and download dependencies first for faster builds
