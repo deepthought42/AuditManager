@@ -55,25 +55,6 @@ public class AuditRecordService {
 
 		AuditRecord audit_record = audit_record_repo.save(audit);
 		
-		/*
-		if(audit instanceof DomainAuditRecord 
-				&& account_id != null 
-				&& account_id >= 0 
-				&& domain_id != null 
-				&& domain_id >= 0) 
-		{
-			try {
-				Account account = account_service.findById(account_id).get();
-				int id_start_idx = account.getUserId().indexOf('|');
-				String user_id = account.getUserId().substring(id_start_idx+1);
-				Domain domain = domain_service.findById(domain_id).get();
-				DomainDto domain_dto = domain_dto_service.build(domain);
-				MessageBroadcaster.sendAuditRecord(user_id, domain_dto);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		*/
 		//broadcast audit record to users
 		return audit_record;
 	}
