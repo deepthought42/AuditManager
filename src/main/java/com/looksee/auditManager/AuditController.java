@@ -21,20 +21,20 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.looksee.auditManager.gcp.PubSubPageAuditPublisherImpl;
-import com.looksee.auditManager.mapper.Body;
-import com.looksee.auditManager.models.AuditRecord;
-import com.looksee.auditManager.models.DomainAuditRecord;
-import com.looksee.auditManager.models.PageAuditRecord;
-import com.looksee.auditManager.models.PageState;
-import com.looksee.auditManager.models.enums.AuditName;
-import com.looksee.auditManager.models.enums.ExecutionStatus;
-import com.looksee.auditManager.models.message.DomainPageBuiltMessage;
-import com.looksee.auditManager.models.message.PageAuditMessage;
-import com.looksee.auditManager.models.message.PageBuiltMessage;
-import com.looksee.auditManager.models.message.SinglePageBuiltMessage;
-import com.looksee.auditManager.services.AuditRecordService;
-import com.looksee.auditManager.services.PageStateService;
+import com.looksee.gcp.PubSubPageAuditPublisherImpl;
+import com.looksee.mapper.Body;
+import com.looksee.models.AuditRecord;
+import com.looksee.models.DomainAuditRecord;
+import com.looksee.models.PageAuditRecord;
+import com.looksee.models.PageState;
+import com.looksee.models.enums.AuditName;
+import com.looksee.models.enums.ExecutionStatus;
+import com.looksee.models.message.DomainPageBuiltMessage;
+import com.looksee.models.message.PageAuditMessage;
+import com.looksee.models.message.PageBuiltMessage;
+import com.looksee.models.message.SinglePageBuiltMessage;
+import com.looksee.services.AuditRecordService;
+import com.looksee.services.PageStateService;
 
 /**
  * Main ReST Controller for this micro-service. Expects to receive either a {@linkplain DomainPageBuiltMessage} or a {@linkplain SinglePageBuiltMessage}
@@ -64,8 +64,8 @@ public class AuditController {
 	 * @throws InterruptedException
 	 */
 	@RequestMapping(value = "/", method = RequestMethod.POST)
-	public ResponseEntity<String> receiveMessage(@RequestBody Body body) 
-		throws JsonMappingException, JsonProcessingException, ExecutionException, InterruptedException 
+	public ResponseEntity<String> receiveMessage(@RequestBody Body body)
+		throws JsonMappingException, JsonProcessingException, ExecutionException, InterruptedException
 	{
 		Body.Message message = body.getMessage();
 		String data = message.getData();
@@ -122,10 +122,9 @@ public class AuditController {
 				log.warn("Creating PageAuditRecord");
 				AuditRecord audit_record = new PageAuditRecord(ExecutionStatus.BUILDING_PAGE,
 																new HashSet<>(),
-																null,
+																page_state.get(),
 																true,
-																auditNames,
-																url);
+																auditNames);
 				
 				audit_record = audit_record_service.save(audit_record);
 				audit_record_service.addPageAuditToDomainAudit(page_built_message.getAuditRecordId(),
@@ -164,7 +163,7 @@ public class AuditController {
 		    
 			if(page_created_msg.getPageAuditId() >= 0 && !audit_record_service.wasSinglePageAlreadyAudited(page_created_msg.getPageAuditId(), page_created_msg.getPageId())) {
 		    	//add page state to page audit record
-		    	audit_record_service.addPageToAuditRecord(page_created_msg.getPageAuditId(), 
+		    	audit_record_service.addPageToAuditRecord(page_created_msg.getPageAuditId(),
 						  								  page_created_msg.getPageId());
 		    	
 		    	//send message to audit record topic to have page audited
