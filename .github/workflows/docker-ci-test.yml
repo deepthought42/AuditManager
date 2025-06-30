@@ -20,7 +20,10 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '17'
+          java-version: '21'
+
+      - name: Download core JAR
+        run: bash scripts/download-core.sh
 
       - name: Test with Maven
         run: mvn test
