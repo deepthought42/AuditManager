@@ -13,7 +13,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
 	    <springboot.version>2.6.13</springboot.version>
-		<core.version>0.2.5</core.version>
+		<core.version>0.2.6</core.version>
     </properties>
     <dependencyManagement>
 	    <dependencies>
