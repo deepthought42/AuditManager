@@ -13,6 +13,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
 	    <springboot.version>2.6.13</springboot.version>
+		<core.version>0.2.5</core.version>
     </properties>
     <dependencyManagement>
 	    <dependencies>
@@ -288,9 +289,9 @@
 		<dependency>
             <groupId>com.looksee</groupId>
             <artifactId>core</artifactId>
-            <version>0.2.1</version>
+            <version>${core.version}</version>
             <scope>system</scope>
-            <systemPath>${pom.basedir}/libs/core-0.2.1.jar</systemPath>
+            <systemPath>${pom.basedir}/libs/core-${core.version}.jar</systemPath>
         </dependency>
 	</dependencies>
 
