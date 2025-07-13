@@ -1,5 +1,5 @@
 # Use an official Maven image to build the project
-FROM maven:3.9.6-eclipse-temurin-21 as build
+FROM maven:3.9.6-eclipse-temurin-17 as build
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -19,7 +19,7 @@ COPY src ./src
 RUN mvn clean install -DskipTests
 
 # Use a smaller JDK image to run the app
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:17-jre
 
 # Copy the built JAR file from the previous stage
 COPY --from=build /app/target/*.jar app.jar
