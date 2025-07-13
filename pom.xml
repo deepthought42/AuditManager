@@ -7,13 +7,13 @@
 
   	<properties>
 	    <selenium-version>3.141.59</selenium-version>
-	    <maven.compiler.source>21</maven.compiler.source>
-	    <maven.compiler.target>21</maven.compiler.target>
+	    <maven.compiler.source>17</maven.compiler.source>
+	    <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>21</java.version>
+        <java.version>17</java.version>
 	    <springboot.version>2.6.13</springboot.version>
-		<core.version>0.2.5</core.version>
+		<core.version>0.2.6</core.version>
     </properties>
     <dependencyManagement>
 	    <dependencies>
@@ -302,8 +302,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.11.0</version>
 				<configuration>
-					<source>21</source>
-					<target>21</target>
+					<source>17</source>
+					<target>17</target>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.projectlombok</groupId>

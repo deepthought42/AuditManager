@@ -22,8 +22,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
-          java-version: '21'
+          distribution: 'temurin'
+          java-version: '17'
 
       - name: Download core JAR
         run: bash scripts/download-core.sh
@@ -103,8 +103,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
-          java-version: '21'
+          distribution: 'temurin'
+          java-version: '17'
       
       - name: Download core JAR
         run: bash scripts/download-core.sh
