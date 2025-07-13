@@ -1,3 +1,19 @@
+## [1.0.2](https://github.com/deepthought42/AuditManager/compare/v1.0.1...v1.0.2) (2025-07-13)
+
+
+### Bug Fixes
+
+* downgrade jdk version ([6894d77](https://github.com/deepthought42/AuditManager/commit/6894d77afd1de4173b194fcc5c861b736f969ed7))
+* fix for core refactoring ([c3e2b99](https://github.com/deepthought42/AuditManager/commit/c3e2b992a0d34a9a97c4c93c4fba2785b0edf9b8))
+* pom cleanup ([27354c2](https://github.com/deepthought42/AuditManager/commit/27354c275cc4dde426f583e3586057419a4c3c78))
+* refactor core code ([3d6b1d5](https://github.com/deepthought42/AuditManager/commit/3d6b1d549a62ed8e78898a60f9a25c6a740190e6))
+* Release ci ([7cf78f6](https://github.com/deepthought42/AuditManager/commit/7cf78f6f19e503bc785594e279f95bc2b44a4372))
+* renamed master branch rule ([b2a8be1](https://github.com/deepthought42/AuditManager/commit/b2a8be1281fa478a959d5a0dc0b1154b462e04c1))
+* semantic-release version bump ([24a5024](https://github.com/deepthought42/AuditManager/commit/24a5024fbf2dcdbd9076cd03070b5c89e30ea121))
+* split pipeline into 2 pipelines ([63685d3](https://github.com/deepthought42/AuditManager/commit/63685d32bc578a5dbc8d500181ca04e2f262b289))
+* upgrade core ([01f16bf](https://github.com/deepthought42/AuditManager/commit/01f16bf1e85e852554ed9f0afd0527191ba6150a))
+* upgrade core ([f92d1a4](https://github.com/deepthought42/AuditManager/commit/f92d1a450a8aafd78d8f7516cb308edbfbda49d9))
+
 ## [1.0.1](https://github.com/deepthought42/AuditManager/compare/v1.0.0...v1.0.1) (2025-04-28)
 
 
