@@ -171,19 +171,29 @@ The application includes comprehensive retry and circuit breaker configurations 
 
 ### Local Development
 
-#### 1. Build the Application
+#### Install LookseeCore JAR to Local Maven Repository
+
+Before building, you must install the LookseeCore JAR to your local Maven repository:
+
+```bash
+mvn install:install-file -Dfile=libs/core-0.2.6.jar -DgroupId=com.looksee -DartifactId=core -Dversion=0.2.6 -Dpackaging=jar
+```
+
+This ensures the core library is available for local builds and runs.
+
+#### Build the Application
 ```bash
 mvn clean install
 ```
 
-#### 2. Run Locally
+#### Run Locally
 ```bash
 java -ea -jar target/audit-manager-1.0.1.jar
 ```
 
 **Note**: The `-ea` flag enables assertions for debugging.
 
-#### 3. Docker (Alternative)
+#### Docker (Alternative)
 ```bash
 # Build image
 docker build --tag audit-manager .

@@ -25,6 +25,9 @@ jobs:
       - name: Download core JAR
         run: bash scripts/download-core.sh
 
+      - name: Install core JAR
+        run: mvn install:install-file -Dfile=libs/core-0.2.6.jar -DgroupId=com.looksee -DartifactId=core -Dversion=0.2.6 -Dpackaging=jar
+        
       - name: Test with Maven
         run: mvn test
         

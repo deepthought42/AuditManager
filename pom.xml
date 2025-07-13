@@ -99,9 +99,9 @@
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.retry/spring-retry -->
 		<dependency>
-		  <groupId>org.springframework.boot</groupId>
-		  <artifactId>spring-boot-starter-aop</artifactId>
-		  <version>${springboot.version}</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+			<version>${springboot.version}</version>
 		</dependency>
 		
 	   	<dependency>
@@ -165,14 +165,14 @@
 		</dependency>
 
 		<dependency>
-	     	<groupId>org.springframework.cloud</groupId>
-	      	<artifactId>spring-cloud-gcp-dependencies</artifactId>
-	      	<version>1.2.5.RELEASE</version>
-	     	<type>pom</type>
-	     	<scope>import</scope>
-	    </dependency>
-	    
-	    <!-- https://mvnrepository.com/artifact/com.google.cloud/spring-cloud-gcp-starter-storage -->
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-gcp-dependencies</artifactId>
+			<version>1.2.5.RELEASE</version>
+			<type>pom</type>
+			<scope>import</scope>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/com.google.cloud/spring-cloud-gcp-starter-storage -->
 		<dependency>
 		    <groupId>com.google.cloud</groupId>
 		    <artifactId>spring-cloud-gcp-starter-vision</artifactId>
@@ -181,8 +181,8 @@
 
 		<!-- Add Secret Manager Starter -->
 	    <dependency>
-	      <groupId>com.google.cloud</groupId>
-	      <artifactId>spring-cloud-gcp-starter-secretmanager</artifactId>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>spring-cloud-gcp-starter-secretmanager</artifactId>
 	    </dependency>
 				
 		<!-- https://mvnrepository.com/artifact/com.google.cloud/spring-cloud-gcp-starter-storage -->
@@ -201,29 +201,29 @@
 
 		<!-- https://mvnrepository.com/artifact/com.getsentry.raven/raven-logback -->
 		<dependency>
-		    <groupId>com.getsentry.raven</groupId>
-		    <artifactId>raven-logback</artifactId>
-		    <version>8.0.3</version>
+			<groupId>com.getsentry.raven</groupId>
+			<artifactId>raven-logback</artifactId>
+			<version>8.0.3</version>
 		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/net.sourceforge.cssparser/cssparser -->
 		<dependency>
-		    <groupId>net.sourceforge.cssparser</groupId>
-		    <artifactId>cssparser</artifactId>
-		    <version>0.9.27</version>
+			<groupId>net.sourceforge.cssparser</groupId>
+			<artifactId>cssparser</artifactId>
+			<version>0.9.27</version>
 		</dependency>
 		
 		<dependency>
-		    <groupId>xml-apis</groupId>
-		    <artifactId>xml-apis</artifactId>
-		    <version>1.4.01</version>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis</artifactId>
+			<version>1.4.01</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/net.sf.jtidy/jtidy -->
 		<dependency>
-		    <groupId>net.sf.jtidy</groupId>
-		    <artifactId>jtidy</artifactId>
-		    <version>r938</version>
+			<groupId>net.sf.jtidy</groupId>
+			<artifactId>jtidy</artifactId>
+			<version>r938</version>
 		</dependency>
 		
 		<dependency>
@@ -234,48 +234,48 @@
         
 		<!-- https://mvnrepository.com/artifact/com.google.cloud/google-cloud-language -->
 		<dependency>
-		    <groupId>com.google.cloud</groupId>
-		    <artifactId>google-cloud-language</artifactId>
-		    <version>2.7.0</version>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>google-cloud-language</artifactId>
+			<version>2.7.0</version>
 		</dependency>
 
- 		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
+		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
 		<dependency>
-	    	<groupId>org.seleniumhq.selenium</groupId>
-	        <artifactId>selenium-java</artifactId>
-	        <version>${selenium-version}</version>
-	        <exclusions>
-			    <exclusion>
-			        <groupId>javax.servlet</groupId>
-			        <artifactId>servlet-api</artifactId>
-			    </exclusion>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>${selenium-version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
 			</exclusions>
-	    </dependency>
-	    
-	    <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-server -->
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-server -->
 		<dependency>
-		    <groupId>org.seleniumhq.selenium</groupId>
-		    <artifactId>selenium-server</artifactId>
-		    <version>${selenium-version}</version>
-		    <exclusions>
-			    <exclusion>
-			        <groupId>javax.servlet</groupId>
-			        <artifactId>servlet-api</artifactId>
-			    </exclusion>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-server</artifactId>
+			<version>${selenium-version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/com.assertthat/selenium-shutterbug -->
 		<dependency>
-		    <groupId>com.assertthat</groupId>
-		    <artifactId>selenium-shutterbug</artifactId>
-		    <version>1.5</version>
-		    <exclusions>
-		        <exclusion>
-				    <groupId>org.seleniumhq.selenium</groupId>
-				    <artifactId>selenium-java</artifactId>
+			<groupId>com.assertthat</groupId>
+			<artifactId>selenium-shutterbug</artifactId>
+			<version>1.5</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.seleniumhq.selenium</groupId>
+					<artifactId>selenium-java</artifactId>
 				</exclusion>
-	     	</exclusions>
+			</exclusions>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/io.swagger.core.v3/swagger-annotations -->
