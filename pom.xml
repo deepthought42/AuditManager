@@ -55,10 +55,10 @@
 	    </dependency>
 	    
 	    <dependency>
-	      <groupId>junit</groupId>
-	      <artifactId>junit</artifactId>
-	      <version>4.13.2</version>
-	      <scope>test</scope>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.2</version>
+			<scope>test</scope>
 	    </dependency>
 	    
 		<!--  SHUTTERBUG DEPENDENCIES -->
@@ -68,7 +68,7 @@
             <version>2.8.0</version>
         </dependency>
         
-	     <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
 		<dependency>
 		    <groupId>org.apache.commons</groupId>
 		    <artifactId>commons-collections4</artifactId>
@@ -290,8 +290,6 @@
             <groupId>com.looksee</groupId>
             <artifactId>core</artifactId>
             <version>${core.version}</version>
-            <scope>system</scope>
-            <systemPath>${pom.basedir}/libs/core-${core.version}.jar</systemPath>
         </dependency>
 	</dependencies>
 
