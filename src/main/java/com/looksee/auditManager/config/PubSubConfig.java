@@ -15,21 +15,46 @@ import com.looksee.services.PageStateService;
 @Configuration
 public class PubSubConfig {
 
-    @Bean
-    @ConditionalOnMissingBean
-    public PubSubPageAuditPublisherImpl audit_record_topic() {
-        return new PubSubPageAuditPublisherImpl();
+    public PubSubConfig() {
+        System.out.println("🔧 PubSubConfig constructor called - configuration is being loaded");
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    public AuditRecordService audit_record_service() {
-        return new AuditRecordService();
+    @Bean(name = "audit_record_topic")
+    public PubSubPageAuditPublisherImpl auditRecordTopic() {
+        try {
+            PubSubPageAuditPublisherImpl publisher = new PubSubPageAuditPublisherImpl();
+            System.out.println("✅ Created PubSubPageAuditPublisherImpl bean successfully");
+            return publisher;
+        } catch (Exception e) {
+            System.err.println("❌ Failed to create PubSubPageAuditPublisherImpl: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    public PageStateService page_state_service() {
-        return new PageStateService();
+    @Bean(name = "audit_record_service")
+    public AuditRecordService auditRecordService() {
+        try {
+            AuditRecordService service = new AuditRecordService();
+            System.out.println("✅ Created AuditRecordService bean successfully");
+            return service;
+        } catch (Exception e) {
+            System.err.println("❌ Failed to create AuditRecordService: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @Bean(name = "page_state_service")
+    public PageStateService pageStateService() {
+        try {
+            PageStateService service = new PageStateService();
+            System.out.println("✅ Created PageStateService bean successfully");
+            return service;
+        } catch (Exception e) {
+            System.err.println("❌ Failed to create PageStateService: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 } 
