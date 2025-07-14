@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/deepthought42/AuditManager/compare/v1.0.2...v1.0.3) (2025-07-14)
+
+
+### Bug Fixes
+
+* bump core version ([bfe702d](https://github.com/deepthought42/AuditManager/commit/bfe702dfdd6285322b611feffe53157018874ccf))
+
 ## [1.0.2](https://github.com/deepthought42/AuditManager/compare/v1.0.1...v1.0.2) (2025-07-13)
 
 
