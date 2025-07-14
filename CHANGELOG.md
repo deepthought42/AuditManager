@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/deepthought42/AuditManager/compare/v1.0.4...v1.0.5) (2025-07-14)
+
+
+### Bug Fixes
+
+* add pubsub topic bean ([1535a2d](https://github.com/deepthought42/AuditManager/commit/1535a2d65d2fd7d0e22f42c14148c56d39f5e47c))
+
 ## [1.0.4](https://github.com/deepthought42/AuditManager/compare/v1.0.3...v1.0.4) (2025-07-14)
 
 
