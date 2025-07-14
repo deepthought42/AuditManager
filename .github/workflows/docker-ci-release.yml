@@ -26,7 +26,7 @@ jobs:
         run: bash scripts/download-core.sh
 
       - name: Install core JAR
-        run: mvn install:install-file -Dfile=libs/core-0.2.7.jar -DgroupId=com.looksee -DartifactId=core -Dversion=0.2.7 -Dpackaging=jar
+        run: mvn install:install-file -Dfile=libs/core-0.3.0.jar -DgroupId=com.looksee -DartifactId=core -Dversion=0.3.0 -Dpackaging=jar
       
       - name: Test with Maven
         run: mvn test
@@ -117,7 +117,7 @@ jobs:
         run: bash scripts/download-core.sh
 
       - name: Install core JAR
-        run: mvn install:install-file -Dfile=libs/core-0.2.7.jar -DgroupId=com.looksee -DartifactId=core -Dversion=0.2.7 -Dpackaging=jar
+        run: mvn install:install-file -Dfile=libs/core-0.3.0.jar -DgroupId=com.looksee -DartifactId=core -Dversion=0.3.0 -Dpackaging=jar
       
       - name: Test with Maven
         run: mvn install -DskipTests

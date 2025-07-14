@@ -54,9 +54,13 @@ public class AuditController {
 	private PageStateService page_state_service;
 	
 	/**
-	 * 
-	 * @param body
-	 * @return
+	 * 	Receives a message from the page-built topic and processes it.
+	 * 	Either creates a new audit record or adds a page to an existing audit record.
+	 * 	Publishes a message to the page-audit topic to indicate that the page is being audited.
+	 * 	Publishes a message to the audit-update topic to indicate that the audit is complete.
+	 *
+	 * @param body The message from the page-built topic
+	 * @return A response entity with a success message
 	 * 
 	 * @throws JsonMappingException
 	 * @throws JsonProcessingException
