@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/deepthought42/AuditManager/compare/v1.0.3...v1.0.4) (2025-07-14)
+
+
+### Bug Fixes
+
+* Body class import ([64895a3](https://github.com/deepthought42/AuditManager/commit/64895a3f149ce421839bab723e72a8db50b56d70))
+
 ## [1.0.3](https://github.com/deepthought42/AuditManager/compare/v1.0.2...v1.0.3) (2025-07-14)
 
 
