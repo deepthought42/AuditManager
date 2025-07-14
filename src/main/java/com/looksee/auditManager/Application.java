@@ -12,15 +12,14 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 
-
-@SpringBootApplication
-@ComponentScan(basePackages = {
-    "com.looksee.auditManager",  // Our application package
-    "com.looksee.gcp",           // LookseeCore GCP services
-    "com.looksee.services",      // LookseeCore services
-    "com.looksee.models",        // LookseeCore models (if they have @Component annotations)
-    "com.looksee.mapper"         // LookseeCore mappers
+/**
+ * Main application class for the audit manager microservice.
+ */
+@SpringBootApplication(exclude = {
+    // Exclude LookseeCoreAutoConfiguration to prevent circular import issue
+    com.looksee.LookseeCoreAutoConfiguration.class
 })
+@ComponentScan(basePackages = {"com.looksee.auditManager"})
 @PropertySources({
 	@PropertySource("classpath:application.properties")
 })
