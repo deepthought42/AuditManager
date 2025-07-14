@@ -1,3 +1,13 @@
+## [1.0.6](https://github.com/deepthought42/AuditManager/compare/v1.0.5...v1.0.6) (2025-07-14)
+
+
+### Bug Fixes
+
+* bean import error ([236caf1](https://github.com/deepthought42/AuditManager/commit/236caf1c4b8826d96976bdd477391925d459e61a))
+* pubsub config ([8c89a79](https://github.com/deepthought42/AuditManager/commit/8c89a79dcb02710800d067681c1be3e45dee874d))
+* pubsub config and application excludes core auto config ([975ad73](https://github.com/deepthought42/AuditManager/commit/975ad73f56c5b819766f4c9e4a71bb1b21415b9a))
+* pubsub config update and default properties in application.properties ([4ee688f](https://github.com/deepthought42/AuditManager/commit/4ee688f67587ac61fa45dadc3fd218d952806470))
+
 ## [1.0.5](https://github.com/deepthought42/AuditManager/compare/v1.0.4...v1.0.5) (2025-07-14)
 
 
