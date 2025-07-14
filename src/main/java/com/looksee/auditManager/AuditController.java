@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.StreamingHttpOutputMessage.Body;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.looksee.gcp.PubSubPageAuditPublisherImpl;
-import com.looksee.mapper.Body;
 import com.looksee.models.PageState;
 import com.looksee.models.audit.AuditRecord;
 import com.looksee.models.audit.DomainAuditRecord;
@@ -54,9 +54,13 @@ public class AuditController {
 	private PageStateService page_state_service;
 	
 	/**
-	 * 
-	 * @param body
-	 * @return
+	 * 	Receives a message from the page-built topic and processes it.
+	 * 	Either creates a new audit record or adds a page to an existing audit record.
+	 * 	Publishes a message to the page-audit topic to indicate that the page is being audited.
+	 * 	Publishes a message to the audit-update topic to indicate that the audit is complete.
+	 *
+	 * @param body The message from the page-built topic
+	 * @return A response entity with a success message
 	 * 
 	 * @throws JsonMappingException
 	 * @throws JsonProcessingException

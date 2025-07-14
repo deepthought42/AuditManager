@@ -13,7 +13,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
 	    <springboot.version>2.6.13</springboot.version>
-		<core.version>0.2.7</core.version>
+		<core.version>0.3.0</core.version>
     </properties>
     <dependencyManagement>
 	    <dependencies>
@@ -104,16 +104,16 @@
 			<version>${springboot.version}</version>
 		</dependency>
 		
-	   	<dependency>
-        	<groupId>org.springframework.cloud</groupId>
-        	<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
-    		<version>2.1.5</version>
-   		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+			<version>2.1.5</version>
+		</dependency>
 
 		<dependency>
-		  <groupId>com.pusher</groupId>
-		  <artifactId>pusher-http-java</artifactId>
-		  <version>1.0.0</version>
+			<groupId>com.pusher</groupId>
+			<artifactId>pusher-http-java</artifactId>
+			<version>1.0.0</version>
 		</dependency>
 		
 	    <dependency>
