@@ -1,3 +1,10 @@
+## [1.0.7](https://github.com/deepthought42/AuditManager/compare/v1.0.6...v1.0.7) (2025-07-15)
+
+
+### Bug Fixes
+
+* remove unused dependencies ([3acf611](https://github.com/deepthought42/AuditManager/commit/3acf61167406db2e2f6ee82d4d52102302d88b29))
+
 ## [1.0.6](https://github.com/deepthought42/AuditManager/compare/v1.0.5...v1.0.6) (2025-07-14)
 
 
