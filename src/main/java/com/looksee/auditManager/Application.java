@@ -26,8 +26,9 @@ import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 @EnableNeo4jRepositories(basePackages = {
     "com.looksee.models.repository"
 })
-@EntityScan(basePackages = { 
-    "com.looksee.models"
+@EntityScan(basePackages = {
+    "com.looksee.models",
+	"com.looksee.gcp"
 })
 public class Application {
 	@SuppressWarnings("unused")
