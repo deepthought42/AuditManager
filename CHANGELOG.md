@@ -1,3 +1,10 @@
+## [1.0.8](https://github.com/deepthought42/AuditManager/compare/v1.0.7...v1.0.8) (2025-07-15)
+
+
+### Bug Fixes
+
+* add repositories to entity scan ([36baf93](https://github.com/deepthought42/AuditManager/commit/36baf930f81935952bf74316cc9db4aeaa458834))
+
 ## [1.0.7](https://github.com/deepthought42/AuditManager/compare/v1.0.6...v1.0.7) (2025-07-15)
 
 
