@@ -1,3 +1,10 @@
+## [1.0.9](https://github.com/deepthought42/AuditManager/compare/v1.0.8...v1.0.9) (2025-07-15)
+
+
+### Bug Fixes
+
+* removed classpath file ([ac7d2be](https://github.com/deepthought42/AuditManager/commit/ac7d2be66ce4be5ed95af551761da113ee3819c8))
+
 ## [1.0.8](https://github.com/deepthought42/AuditManager/compare/v1.0.7...v1.0.8) (2025-07-15)
 
 
