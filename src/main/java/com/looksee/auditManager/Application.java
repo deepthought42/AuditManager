@@ -23,8 +23,12 @@ import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 @PropertySources({
 	@PropertySource("classpath:application.properties")
 })
-@EnableNeo4jRepositories("com.looksee.auditManager.models.repository")
-@EntityScan(basePackages = { "com.looksee.auditManager.models"} )
+@EnableNeo4jRepositories(basePackages = {
+    "com.looksee.models.repository"
+})
+@EntityScan(basePackages = { 
+    "com.looksee.models"
+})
 public class Application {
 	@SuppressWarnings("unused")
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
