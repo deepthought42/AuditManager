@@ -14,6 +14,7 @@
 	    <springboot.version>2.6.13</springboot.version>
 		<core.version>0.3.1</core.version>
     </properties>
+
     <dependencyManagement>
 	    <dependencies>
 			<dependency>
@@ -136,8 +137,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.11.0</version>
 				<configuration>
-					<source>17</source>
-					<target>17</target>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.projectlombok</groupId>
@@ -174,9 +175,9 @@
 				<artifactId>jib-maven-plugin</artifactId>
 				<version>3.2.1</version>
 				<configuration>
-				<to>
-					<image>gcr.io/PROJECT_ID/pubsub</image>
-				</to>
+					<to>
+						<image>gcr.io/PROJECT_ID/pubsub</image>
+					</to>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -189,14 +190,14 @@
 				</configuration>
 				<executions>
 					<execution>
-					<goals>
-						<goal>repackage</goal>
-					</goals>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>
-	    </plugins>
-  	</build>
+		</plugins>
+	</build>
     
     <repositories>
         <repository>
