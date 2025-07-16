@@ -1,3 +1,11 @@
+## [1.0.10](https://github.com/deepthought42/AuditManager/compare/v1.0.9...v1.0.10) (2025-07-16)
+
+
+### Bug Fixes
+
+* parameterize maven compiler plugin versions ([e003531](https://github.com/deepthought42/AuditManager/commit/e0035313abd821a0b96f6751569b7f34b3930db8))
+* update pom ([88b1b2c](https://github.com/deepthought42/AuditManager/commit/88b1b2c83f9d039ee794c84f9fd6082248a7474f))
+
 ## [1.0.9](https://github.com/deepthought42/AuditManager/compare/v1.0.8...v1.0.9) (2025-07-15)
 
 
