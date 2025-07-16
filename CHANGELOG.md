@@ -1,3 +1,10 @@
+## [1.0.11](https://github.com/deepthought42/AuditManager/compare/v1.0.10...v1.0.11) (2025-07-16)
+
+
+### Bug Fixes
+
+* clean up application properties ([f368c22](https://github.com/deepthought42/AuditManager/commit/f368c2235fdb25ccbabfe64415334f90a066d924))
+
 ## [1.0.10](https://github.com/deepthought42/AuditManager/compare/v1.0.9...v1.0.10) (2025-07-16)
 
 
