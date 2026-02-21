@@ -163,7 +163,7 @@ The application includes comprehensive retry and circuit breaker configurations 
 ## Getting Started
 
 ### Prerequisites
-- Java 21
+- Java 17
 - Maven 3.9+
 - Neo4j Database
 - Google Cloud Platform account
@@ -259,6 +259,7 @@ Receives page build notifications and initiates audits.
 
 **Response**:
 - `200 OK`: Message processed successfully
+- `400 Bad Request`: Invalid payload, message encoding, or message format
 - `500 Internal Server Error`: Processing error
 
 ## Testing
