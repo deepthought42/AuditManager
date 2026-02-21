@@ -44,13 +44,13 @@ class AuditControllerTest {
 	}
 
 	@Test
-	void shouldReturnBadRequestWhenBodyIsMissing() {
+	void shouldReturnBadRequestWhenBodyIsMissing() throws Exception {
 		ResponseEntity<String> response = controller.receiveMessage(null);
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 	}
 
 	@Test
-	void shouldReturnBadRequestWhenMessageDataIsNotBase64() {
+	void shouldReturnBadRequestWhenMessageDataIsNotBase64() throws Exception {
 		Body body = mockBodyWithData("not-base64");
 
 		ResponseEntity<String> response = controller.receiveMessage(body);
@@ -60,7 +60,7 @@ class AuditControllerTest {
 	}
 
 	@Test
-	void shouldReturnBadRequestWhenDecodedPayloadIsNotJson() {
+	void shouldReturnBadRequestWhenDecodedPayloadIsNotJson() throws Exception {
 		String encoded = Base64.getEncoder().encodeToString("invalid-json".getBytes(StandardCharsets.UTF_8));
 		Body body = mockBodyWithData(encoded);
 
@@ -71,7 +71,7 @@ class AuditControllerTest {
 	}
 
 	@Test
-	void shouldSkipWhenPageAlreadyAudited() {
+	void shouldSkipWhenPageAlreadyAudited() throws Exception {
 		String payload = "{\"accountId\":1,\"pageId\":2,\"auditRecordId\":3}";
 		String encoded = Base64.getEncoder().encodeToString(payload.getBytes(StandardCharsets.UTF_8));
 		Body body = mockBodyWithData(encoded);
