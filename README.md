@@ -40,7 +40,7 @@ The system supports the following audit categories:
 ## Architecture
 
 ### Technology Stack
-- **Java 21**: Core programming language
+- **Java 17**: Core programming language
 - **Spring Boot 2.6.13**: Application framework
 - **Neo4j**: Graph database for audit record storage
 - **Google Cloud Pub/Sub**: Message queuing and event streaming
@@ -163,7 +163,7 @@ The application includes comprehensive retry and circuit breaker configurations 
 ## Getting Started
 
 ### Prerequisites
-- Java 21
+- Java 17
 - Maven 3.9+
 - Neo4j Database
 - Google Cloud Platform account
@@ -259,6 +259,7 @@ Receives page build notifications and initiates audits.
 
 **Response**:
 - `200 OK`: Message processed successfully
+- `400 Bad Request`: Invalid payload, message encoding, or message format
 - `500 Internal Server Error`: Processing error
 
 ## Testing
@@ -322,3 +323,45 @@ For issues and questions:
 - Create an issue on GitHub
 - Check the [CHANGELOG.md](CHANGELOG.md) for recent updates
 - Review the configuration examples in this README
+
+## Code Review Findings and Proposed Fixes
+
+A focused code review identified several reliability and maintainability issues.
+
+### ✅ Fixed in this update
+
+1. **Controller returned HTTP 200 even on malformed payloads**
+   - **Issue**: Invalid Base64/JSON payloads were logged and still returned success.
+   - **Fix**: Added explicit request validation and now return `400 Bad Request` for invalid payloads.
+
+2. **Potential `NoSuchElementException` when `PageState` is absent**
+   - **Issue**: `page_state.get()` could be called even when empty.
+   - **Fix**: Guarded audit creation behind `page_state.isPresent()` and log skip conditions.
+
+3. **Unsafe casting from `AuditRecord` to `DomainAuditRecord`**
+   - **Issue**: Direct cast could fail at runtime if record type differs.
+   - **Fix**: Added `instanceof` check before casting and safe fallback to default audit labels.
+
+4. **Excessive payload logging and stack-trace printing**
+   - **Issue**: Full message payload and `printStackTrace()` increase noise and risk sensitive log exposure.
+   - **Fix**: Switched to structured SLF4J logging and removed raw stack-trace printing.
+
+5. **Build resolution failure due to missing Maven Central repository**
+   - **Issue**: Dependency BOM imports failed when resolving through `atlassian-public`.
+   - **Fix**: Added explicit Maven Central repository to `pom.xml`.
+
+6. **Controller testability gaps from field injection and no unit tests**
+   - **Issue**: Field injection and no tests made regression detection difficult.
+   - **Fix**: Switched to constructor injection and added controller unit tests for invalid payload paths and duplicate-page skip behavior.
+
+### 📌 Additional proposed follow-up fixes
+
+1. **Introduce input schema validation and request signature verification**
+   - Helps prevent malformed or spoofed Pub/Sub messages.
+
+2. **Replace hard-coded default audit labels with configuration**
+   - Improves operational flexibility without code changes.
+
+3. **Reduce DEBUG logging defaults in production**
+   - Current bean-level DEBUG logs can create high-volume output.
+

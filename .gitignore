@@ -17,3 +17,6 @@ src/main/resources/application.conf
 
 
 LOG_FILE_IS_UNDEFINED
+
+# Maven shade output
+/dependency-reduced-pom.xml

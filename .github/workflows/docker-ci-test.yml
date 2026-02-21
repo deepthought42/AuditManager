@@ -29,19 +29,27 @@ jobs:
         run: mvn install:install-file -Dfile=libs/core-0.3.1.jar -DgroupId=com.looksee -DartifactId=core -Dversion=0.3.1 -Dpackaging=jar
         
       - name: Test with Maven
-        run: mvn test
+        run: mvn -B -ntp clean test
         
   build:
     needs: test
     runs-on: ubuntu-latest
-    env:
-      BRANCH_NAME: ${{ github.head_ref }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
+      - name: Compute safe Docker tag
+        id: docker_tag
+        run: |
+          RAW_TAG="${{ github.head_ref }}"
+          SAFE_TAG=$(echo "$RAW_TAG" | tr '[:upper:]' '[:lower:]' | sed -E 's#[^a-z0-9_.-]+#-#g; s#^-+##; s#-+$##')
+          if [ -z "$SAFE_TAG" ]; then
+            SAFE_TAG="pr-${{ github.event.pull_request.number }}"
+          fi
+          echo "tag=$SAFE_TAG" >> "$GITHUB_OUTPUT"
+
       - name: Build Docker image
         run: |
-          docker build -t deepthought42/audit-manager:${{ env.BRANCH_NAME }} .
-          docker tag deepthought42/audit-manager:${{ env.BRANCH_NAME }} deepthought42/audit-manager:latest
+          docker build -t deepthought42/audit-manager:${{ steps.docker_tag.outputs.tag }} .
+          docker tag deepthought42/audit-manager:${{ steps.docker_tag.outputs.tag }} deepthought42/audit-manager:latest

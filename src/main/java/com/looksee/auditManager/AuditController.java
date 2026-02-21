@@ -1,5 +1,6 @@
 package com.looksee.auditManager;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.Optional;
@@ -8,7 +9,6 @@ import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -29,172 +28,155 @@ import com.looksee.models.audit.DomainAuditRecord;
 import com.looksee.models.audit.PageAuditRecord;
 import com.looksee.models.enums.AuditName;
 import com.looksee.models.enums.ExecutionStatus;
-import com.looksee.models.message.DomainPageBuiltMessage;
 import com.looksee.models.message.PageAuditMessage;
 import com.looksee.models.message.PageBuiltMessage;
-import com.looksee.models.message.SinglePageBuiltMessage;
 import com.looksee.services.AuditRecordService;
 import com.looksee.services.PageStateService;
 
 /**
- * Main ReST Controller for this micro-service. Expects to receive either a {@linkplain DomainPageBuiltMessage} or a {@linkplain SinglePageBuiltMessage}
- *   and passes on information appropriately to micro-services that perform audits as well as sending an {@linkPlain AuditUpdateDto} message to the audit update topic
+ * Main ReST Controller for this micro-service.
  */
 @RestController
 public class AuditController {
-	private static Logger log = LoggerFactory.getLogger(AuditController.class);
+	private static final Logger log = LoggerFactory.getLogger(AuditController.class);
 
-	@Autowired
-	private AuditRecordService audit_record_service;
-	
-	@Autowired
-	private PubSubPageAuditPublisherImpl audit_record_topic;
-	
-	@Autowired
-	private PageStateService page_state_service;
-	
-	/**
-	 * 	Receives a message from the page-built topic and processes it.
-	 * 	Either creates a new audit record or adds a page to an existing audit record.
-	 * 	Publishes a message to the page-audit topic to indicate that the page is being audited.
-	 * 	Publishes a message to the audit-update topic to indicate that the audit is complete.
-	 *
-	 * @param body The message from the page-built topic
-	 * @return A response entity with a success message
-	 * 
-	 * @throws JsonMappingException
-	 * @throws JsonProcessingException
-	 * @throws ExecutionException
-	 * @throws InterruptedException
-	 */
+	private static final ObjectMapper INPUT_MAPPER = new ObjectMapper();
+	private static final JsonMapper OUTPUT_MAPPER = JsonMapper.builder().addModule(new JavaTimeModule()).build();
+
+	private final AuditRecordService auditRecordService;
+	private final PubSubPageAuditPublisherImpl auditRecordTopic;
+	private final PageStateService pageStateService;
+
+	public AuditController(
+		AuditRecordService auditRecordService,
+		PubSubPageAuditPublisherImpl auditRecordTopic,
+		PageStateService pageStateService) {
+		this.auditRecordService = auditRecordService;
+		this.auditRecordTopic = auditRecordTopic;
+		this.pageStateService = pageStateService;
+	}
+
 	@RequestMapping(value = "/", method = RequestMethod.POST)
-	public ResponseEntity<String> receiveMessage(@RequestBody Body body)
-		throws JsonMappingException, JsonProcessingException, ExecutionException, InterruptedException
-	{
-		Body.Message message = body.getMessage();
-		String data = message.getData();
-		String target = !data.isEmpty() ? new String(Base64.getDecoder().decode(data)) : "";
-        log.warn("page-built msg received = " + target);
+	public ResponseEntity<String> receiveMessage(@RequestBody Body body) {
+		if (!hasValidPayload(body)) {
+			log.warn("Received invalid Pub/Sub payload: message or data is missing");
+			return badRequest("Invalid Pub/Sub payload");
+		}
 
-		ObjectMapper input_mapper = new ObjectMapper();
-		JsonMapper mapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
+		String payload = decodePayload(body.getMessage().getData());
+		if (payload == null) {
+			return badRequest("Invalid message encoding");
+		}
 
+		PageBuiltMessage pageBuiltMessage = parseMessage(payload);
+		if (pageBuiltMessage == null) {
+			return badRequest("Invalid message format");
+		}
+
+		return processMessage(pageBuiltMessage);
+	}
+
+	private ResponseEntity<String> processMessage(PageBuiltMessage pageBuiltMessage) {
 		try {
-			PageBuiltMessage page_built_message = input_mapper.readValue(target, PageBuiltMessage.class);
-	    	//DomainPageBuiltMessage domain_audit_message = input_mapper.readValue(target, DomainPageBuiltMessage.class);
-	    	//if page has already been audited then return success with appropriate message
-			//otherwise add page to page audit record and and publish page audit message to pubsub
-			Set<AuditName> auditNames = new HashSet<>();
-			DomainAuditRecord record = null;
-			
-			Optional<AuditRecord> opt_record = audit_record_service.findById(page_built_message.getAuditRecordId());
-			if(opt_record.isPresent()) {
-				log.warn("looking up domain audit record with id = "+page_built_message.getAuditRecordId());
-				record = (DomainAuditRecord)opt_record.get();
-				auditNames = record.getAuditLabels();
-			}
-			else {
-				//VISUAL DESIGN AUDIT
-				auditNames.add(AuditName.TEXT_BACKGROUND_CONTRAST);
-				auditNames.add(AuditName.NON_TEXT_BACKGROUND_CONTRAST);
-				
-				//INFO ARCHITECTURE AUDITS
-				auditNames.add(AuditName.LINKS);
-				auditNames.add(AuditName.TITLES);
-				auditNames.add(AuditName.ENCRYPTED);
-				auditNames.add(AuditName.METADATA);
-				
-				//CONTENT AUDIT
-				auditNames.add(AuditName.ALT_TEXT);
-				auditNames.add(AuditName.READING_COMPLEXITY);
-				auditNames.add(AuditName.PARAGRAPHING);
-				auditNames.add(AuditName.IMAGE_COPYRIGHT);
-				auditNames.add(AuditName.IMAGE_POLICY);
-			}
-			
-			boolean already_audited = audit_record_service.wasPageAlreadyAudited(page_built_message.getAuditRecordId(), page_built_message.getPageId());
-			boolean is_landable = page_state_service.isPageLandable(page_built_message.getPageId());
-			Optional<PageState> page_state = page_state_service.findById(page_built_message.getPageId());
-			String url = "";
-			if(page_state.isPresent()){
-				url = page_state.get().getUrl();
-				log.warn("Received page with url "+url);
-			}
-			log.warn("page with id = "+page_built_message.getPageId()+" already audited? = "+already_audited+";   is landable? = "+is_landable);
-			
-			if( !already_audited && is_landable) {
-				log.warn("Creating PageAuditRecord");
-				AuditRecord audit_record = new PageAuditRecord(ExecutionStatus.BUILDING_PAGE,
-																new HashSet<>(),
-																page_state.get(),
-																true,
-																auditNames);
-				
-				audit_record = audit_record_service.save(audit_record);
-				audit_record_service.addPageAuditToDomainAudit(page_built_message.getAuditRecordId(),
-																audit_record.getId());
-				
-				audit_record_service.addPageToAuditRecord(  audit_record.getId(),
-															page_built_message.getPageId());
-				
-				//send message to page audit message topic
-				PageAuditMessage audit_msg = new PageAuditMessage(	page_built_message.getAccountId(),
-																	audit_record.getId());
-				String audit_record_json = mapper.writeValueAsString(audit_msg);
-				log.warn("(DomainAudit) Sending PageAuditMessage to Pub/Sub = "+audit_record_json);
-				audit_record_topic.publish(audit_record_json);
-			}
-			else {
-				log.warn("Page with id = "+page_built_message.getPageId()+" has already been sent to be audited");
-			}
-			return new ResponseEntity<String>("Successfully sent message to audit manager", HttpStatus.OK);
-		}
-		catch(Exception e){
-			log.error("Error occurred while mapping to DomainPageBuiltMessage");
-			log.error("message : "+target);
-			e.printStackTrace();
-		}
+			Set<AuditName> auditNames = buildAuditNames(pageBuiltMessage.getAuditRecordId());
 
-		/****************
-	     * 
-	     * Processes a Single Page Built Message, which indicates that a single page audit is being performed
-	     * 
-	     **************/
-		/*
-	    try {
-	    	log.warn("Received single page built message");
-		    SinglePageBuiltMessage page_created_msg = input_mapper.readValue(target, SinglePageBuiltMessage.class);
-		    
-			if(page_created_msg.getPageAuditId() >= 0 && !audit_record_service.wasSinglePageAlreadyAudited(page_created_msg.getPageAuditId(), page_created_msg.getPageId())) {
-		    	//add page state to page audit record
-		    	audit_record_service.addPageToAuditRecord(page_created_msg.getPageAuditId(),
-						  								  page_created_msg.getPageId());
-		    	
-		    	//send message to audit record topic to have page audited
-				PageAuditMessage audit_msg = new PageAuditMessage(	page_created_msg.getAccountId(),
-																	page_created_msg.getPageAuditId());
-				
-				String page_audit_msg_json = mapper.writeValueAsString(audit_msg);
-				log.warn("(SinglePageAudit) Sending PageAuditMessage to Pub/Sub = "+page_audit_msg_json);
-				audit_record_topic.publish(page_audit_msg_json);
-				
-		    	//send message to page audit message topic
-				AuditProgressUpdate audit_update = new AuditProgressUpdate(audit_msg.getAccountId(),
-																			audit_msg.getPageAuditId(),
-																			"Data extraction complete!");
-				
-				String audit_update_json = mapper.writeValueAsString(audit_update);
-				audit_update_topic.publish(audit_update_json);
+			boolean alreadyAudited = auditRecordService.wasPageAlreadyAudited(pageBuiltMessage.getAuditRecordId(), pageBuiltMessage.getPageId());
+			boolean isLandable = pageStateService.isPageLandable(pageBuiltMessage.getPageId());
+			Optional<PageState> pageState = pageStateService.findById(pageBuiltMessage.getPageId());
 
-				//TODO: Replace following logic with a message that is publishes an update message to the audit-update topic
-				//AuditUpdateDto audit_dto = buildAuditUpdatedDto(page_created_msg.getPageAuditId(), AuditLevel.PAGE);
-				//pusher.sendAuditUpdate(Long.toString( page_created_msg.getPageAuditId() ), audit_dto);
-		    }
-	    }catch(Exception e) {
-	    	e.printStackTrace();
-	    }
-		*/
-		
-		return new ResponseEntity<String>("Successfully sent message to audit manager", HttpStatus.OK);
-  }
+			if (!alreadyAudited && isLandable && pageState.isPresent()) {
+				return createAndPublishAudit(pageBuiltMessage, pageState.get(), auditNames);
+			}
+
+			log.info("Skipping pageId={} (alreadyAudited={}, landable={}, pageStatePresent={})",
+				pageBuiltMessage.getPageId(), alreadyAudited, isLandable, pageState.isPresent());
+			return ResponseEntity.ok("Successfully processed message");
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			log.error("Audit processing interrupted", e);
+			return new ResponseEntity<String>("Audit processing interrupted", HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (ExecutionException e) {
+			log.error("Error publishing audit message", e);
+			return new ResponseEntity<String>("Failed to process message", HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			log.error("Unexpected error while handling PageBuiltMessage", e);
+			return new ResponseEntity<String>("Failed to process message", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	private ResponseEntity<String> createAndPublishAudit(PageBuiltMessage pageBuiltMessage, PageState pageState, Set<AuditName> auditNames)
+		throws JsonProcessingException, ExecutionException, InterruptedException {
+		log.info("Received page for auditing, pageId={}, url={}", pageBuiltMessage.getPageId(), pageState.getUrl());
+
+		AuditRecord auditRecord = new PageAuditRecord(
+			ExecutionStatus.BUILDING_PAGE,
+			new HashSet<>(),
+			pageState,
+			true,
+			auditNames);
+
+		auditRecord = auditRecordService.save(auditRecord);
+		auditRecordService.addPageAuditToDomainAudit(pageBuiltMessage.getAuditRecordId(), auditRecord.getId());
+		auditRecordService.addPageToAuditRecord(auditRecord.getId(), pageBuiltMessage.getPageId());
+
+		PageAuditMessage auditMessage = new PageAuditMessage(pageBuiltMessage.getAccountId(), auditRecord.getId());
+		String auditRecordJson = OUTPUT_MAPPER.writeValueAsString(auditMessage);
+		log.info("Sending PageAuditMessage to Pub/Sub for pageAuditId={}", auditRecord.getId());
+		auditRecordTopic.publish(auditRecordJson);
+		return ResponseEntity.ok("Successfully processed message");
+	}
+
+	private Set<AuditName> buildAuditNames(long auditRecordId) {
+		Optional<AuditRecord> optRecord = auditRecordService.findById(auditRecordId);
+		if (optRecord.isPresent() && optRecord.get() instanceof DomainAuditRecord) {
+			DomainAuditRecord record = (DomainAuditRecord) optRecord.get();
+			return record.getAuditLabels();
+		}
+		return buildDefaultAuditNames();
+	}
+
+	private Set<AuditName> buildDefaultAuditNames() {
+		Set<AuditName> auditNames = new HashSet<>();
+		auditNames.add(AuditName.TEXT_BACKGROUND_CONTRAST);
+		auditNames.add(AuditName.NON_TEXT_BACKGROUND_CONTRAST);
+		auditNames.add(AuditName.LINKS);
+		auditNames.add(AuditName.TITLES);
+		auditNames.add(AuditName.ENCRYPTED);
+		auditNames.add(AuditName.METADATA);
+		auditNames.add(AuditName.ALT_TEXT);
+		auditNames.add(AuditName.READING_COMPLEXITY);
+		auditNames.add(AuditName.PARAGRAPHING);
+		auditNames.add(AuditName.IMAGE_COPYRIGHT);
+		auditNames.add(AuditName.IMAGE_POLICY);
+		return auditNames;
+	}
+
+	private boolean hasValidPayload(Body body) {
+		return body != null
+			&& body.getMessage() != null
+			&& body.getMessage().getData() != null
+			&& !body.getMessage().getData().isEmpty();
+	}
+
+	private String decodePayload(String encodedData) {
+		try {
+			return new String(Base64.getDecoder().decode(encodedData), StandardCharsets.UTF_8);
+		} catch (IllegalArgumentException e) {
+			log.warn("Received invalid Base64 data from Pub/Sub message", e);
+			return null;
+		}
+	}
+
+	private PageBuiltMessage parseMessage(String payload) {
+		try {
+			return INPUT_MAPPER.readValue(payload, PageBuiltMessage.class);
+		} catch (JsonProcessingException e) {
+			log.error("Error occurred while mapping payload to PageBuiltMessage", e);
+			return null;
+		}
+	}
+
+	private ResponseEntity<String> badRequest(String msg) {
+		return new ResponseEntity<String>(msg, HttpStatus.BAD_REQUEST);
+	}
 }

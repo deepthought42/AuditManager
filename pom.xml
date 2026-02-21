@@ -122,6 +122,12 @@
 			<artifactId>spring-cloud-gcp-starter-secretmanager</artifactId>
 	    </dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- Direct JAR from GitHub release -->
 		<dependency>
             <groupId>com.looksee</groupId>
@@ -199,7 +205,13 @@
 		</plugins>
 	</build>
     
-    <repositories>
+        <repositories>
+        <repository>
+            <id>central</id>
+            <name>Maven Central</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <layout>default</layout>
+        </repository>
         <repository>
             <snapshots>
                 <enabled>true</enabled>
@@ -214,8 +226,9 @@
             <layout>default</layout>
         </repository>
         <repository>
-		    <id>atlassian-public</id>
-		    <url>https://packages.atlassian.com/maven/repository/public</url>
-		</repository>
+            <id>atlassian-public</id>
+            <name>Atlassian Public</name>
+            <url>https://packages.atlassian.com/maven/repository/public</url>
+        </repository>
     </repositories>
 </project>
