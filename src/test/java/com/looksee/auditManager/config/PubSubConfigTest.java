@@ -7,8 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mockConstruction;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.mockito.MockedConstruction;
 
 import com.looksee.gcp.PubSubPageAuditPublisherImpl;
@@ -22,6 +24,11 @@ class PubSubConfigTest {
 	@BeforeEach
 	void setUp() {
 		config = new PubSubConfig();
+	}
+
+	@AfterEach
+	void tearDown() {
+		Mockito.framework().clearInlineMocks();
 	}
 
 	@Test
