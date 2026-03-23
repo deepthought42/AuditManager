@@ -97,7 +97,7 @@ class AuditControllerTest {
 	}
 
 	@Test
-	void shouldReturnBadRequestWhenMessageDataIsNotBase64() {
+	void shouldReturnBadRequestWhenMessageDataIsNotBase64() throws Exception {
 		Body body = mockBodyWithData("not-base64");
 
 		ResponseEntity<String> response = controller.receiveMessage(body);
@@ -108,7 +108,7 @@ class AuditControllerTest {
 	}
 
 	@Test
-	void shouldReturnBadRequestWhenDecodedPayloadIsNotJson() {
+	void shouldReturnBadRequestWhenDecodedPayloadIsNotJson() throws Exception {
 		String encoded = Base64.getEncoder().encodeToString("invalid-json".getBytes(StandardCharsets.UTF_8));
 		Body body = mockBodyWithData(encoded);
 
@@ -120,7 +120,7 @@ class AuditControllerTest {
 	}
 
 	@Test
-	void shouldSkipWhenPageAlreadyAudited() {
+	void shouldSkipWhenPageAlreadyAudited() throws Exception {
 		Body body = createValidBody();
 
 		when(auditRecordService.wasPageAlreadyAudited(3L, 2L)).thenReturn(true);
@@ -135,7 +135,7 @@ class AuditControllerTest {
 	}
 
 	@Test
-	void shouldSkipWhenPageIsNotLandable() {
+	void shouldSkipWhenPageIsNotLandable() throws Exception {
 		Body body = createValidBody();
 
 		when(auditRecordService.wasPageAlreadyAudited(3L, 2L)).thenReturn(false);
@@ -150,7 +150,7 @@ class AuditControllerTest {
 	}
 
 	@Test
-	void shouldSkipWhenPageStateMissing() {
+	void shouldSkipWhenPageStateMissing() throws Exception {
 		Body body = createValidBody();
 
 		when(auditRecordService.wasPageAlreadyAudited(3L, 2L)).thenReturn(false);
