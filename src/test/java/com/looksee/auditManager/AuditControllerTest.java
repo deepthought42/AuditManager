@@ -60,6 +60,30 @@ class AuditControllerTest {
 	}
 
 	@Test
+	void shouldReturnBadRequestWhenMessageIsNull() {
+		Body body = mock(Body.class);
+		when(body.getMessage()).thenReturn(null);
+
+		ResponseEntity<String> response = controller.receiveMessage(body);
+
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+		assertEquals("Invalid Pub/Sub payload", response.getBody());
+	}
+
+	@Test
+	void shouldReturnBadRequestWhenMessageDataIsNull() {
+		Body body = mock(Body.class);
+		Body.Message message = mock(Body.Message.class);
+		when(body.getMessage()).thenReturn(message);
+		when(message.getData()).thenReturn(null);
+
+		ResponseEntity<String> response = controller.receiveMessage(body);
+
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+		assertEquals("Invalid Pub/Sub payload", response.getBody());
+	}
+
+	@Test
 	void shouldReturnBadRequestWhenMessageDataIsMissing() {
 		Body body = mock(Body.class);
 		Body.Message message = mock(Body.Message.class);
