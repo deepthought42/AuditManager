@@ -60,6 +60,30 @@ class AuditControllerTest {
 	}
 
 	@Test
+	void shouldReturnBadRequestWhenMessageIsNull() {
+		Body body = mock(Body.class);
+		when(body.getMessage()).thenReturn(null);
+
+		ResponseEntity<String> response = controller.receiveMessage(body);
+
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+		assertEquals("Invalid Pub/Sub payload", response.getBody());
+	}
+
+	@Test
+	void shouldReturnBadRequestWhenMessageDataIsNull() {
+		Body body = mock(Body.class);
+		Body.Message message = mock(Body.Message.class);
+		when(body.getMessage()).thenReturn(message);
+		when(message.getData()).thenReturn(null);
+
+		ResponseEntity<String> response = controller.receiveMessage(body);
+
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+		assertEquals("Invalid Pub/Sub payload", response.getBody());
+	}
+
+	@Test
 	void shouldReturnBadRequestWhenMessageDataIsMissing() {
 		Body body = mock(Body.class);
 		Body.Message message = mock(Body.Message.class);
@@ -73,7 +97,7 @@ class AuditControllerTest {
 	}
 
 	@Test
-	void shouldReturnBadRequestWhenMessageDataIsNotBase64() {
+	void shouldReturnBadRequestWhenMessageDataIsNotBase64() throws Exception {
 		Body body = mockBodyWithData("not-base64");
 
 		ResponseEntity<String> response = controller.receiveMessage(body);
@@ -84,7 +108,7 @@ class AuditControllerTest {
 	}
 
 	@Test
-	void shouldReturnBadRequestWhenDecodedPayloadIsNotJson() {
+	void shouldReturnBadRequestWhenDecodedPayloadIsNotJson() throws Exception {
 		String encoded = Base64.getEncoder().encodeToString("invalid-json".getBytes(StandardCharsets.UTF_8));
 		Body body = mockBodyWithData(encoded);
 
@@ -96,7 +120,7 @@ class AuditControllerTest {
 	}
 
 	@Test
-	void shouldSkipWhenPageAlreadyAudited() {
+	void shouldSkipWhenPageAlreadyAudited() throws Exception {
 		Body body = createValidBody();
 
 		when(auditRecordService.wasPageAlreadyAudited(3L, 2L)).thenReturn(true);
@@ -111,7 +135,7 @@ class AuditControllerTest {
 	}
 
 	@Test
-	void shouldSkipWhenPageIsNotLandable() {
+	void shouldSkipWhenPageIsNotLandable() throws Exception {
 		Body body = createValidBody();
 
 		when(auditRecordService.wasPageAlreadyAudited(3L, 2L)).thenReturn(false);
@@ -126,7 +150,7 @@ class AuditControllerTest {
 	}
 
 	@Test
-	void shouldSkipWhenPageStateMissing() {
+	void shouldSkipWhenPageStateMissing() throws Exception {
 		Body body = createValidBody();
 
 		when(auditRecordService.wasPageAlreadyAudited(3L, 2L)).thenReturn(false);
@@ -161,7 +185,7 @@ class AuditControllerTest {
 		ArgumentCaptor<String> payloadCaptor = ArgumentCaptor.forClass(String.class);
 		verify(auditRecordTopic).publish(payloadCaptor.capture());
 		assertTrue(payloadCaptor.getValue().contains("\"accountId\":1"));
-		assertTrue(payloadCaptor.getValue().contains("\"auditRecordId\":99"));
+		assertTrue(payloadCaptor.getValue().contains("\"pageAuditId\":99"));
 	}
 
 	@Test
@@ -211,9 +235,18 @@ class AuditControllerTest {
 	@Test
 	void shouldReturnInternalServerErrorWhenInterrupted() throws Exception {
 		Body body = createValidBody();
+		PageState pageState = new PageState();
+		AuditRecord savedRecord = mock(AuditRecord.class);
 
+		when(auditRecordService.wasPageAlreadyAudited(3L, 2L)).thenReturn(false);
+		when(pageStateService.isPageLandable(2L)).thenReturn(true);
+		when(pageStateService.findById(2L)).thenReturn(Optional.of(pageState));
 		when(auditRecordService.findById(3L)).thenReturn(Optional.empty());
-		when(auditRecordService.wasPageAlreadyAudited(3L, 2L)).thenThrow(new InterruptedException("stop"));
+		when(auditRecordService.save(any())).thenReturn(savedRecord);
+		when(savedRecord.getId()).thenReturn(77L);
+		org.mockito.Mockito.doThrow(new InterruptedException("stop"))
+			.when(auditRecordTopic)
+			.publish(any(String.class));
 
 		ResponseEntity<String> response = controller.receiveMessage(body);
 
