@@ -185,7 +185,7 @@ class AuditControllerTest {
 		ArgumentCaptor<String> payloadCaptor = ArgumentCaptor.forClass(String.class);
 		verify(auditRecordTopic).publish(payloadCaptor.capture());
 		assertTrue(payloadCaptor.getValue().contains("\"accountId\":1"));
-		assertTrue(payloadCaptor.getValue().contains("\"auditRecordId\":99"));
+		assertTrue(payloadCaptor.getValue().contains("\"pageAuditId\":99"));
 	}
 
 	@Test
@@ -235,9 +235,18 @@ class AuditControllerTest {
 	@Test
 	void shouldReturnInternalServerErrorWhenInterrupted() throws Exception {
 		Body body = createValidBody();
+		PageState pageState = new PageState();
+		AuditRecord savedRecord = mock(AuditRecord.class);
 
+		when(auditRecordService.wasPageAlreadyAudited(3L, 2L)).thenReturn(false);
+		when(pageStateService.isPageLandable(2L)).thenReturn(true);
+		when(pageStateService.findById(2L)).thenReturn(Optional.of(pageState));
 		when(auditRecordService.findById(3L)).thenReturn(Optional.empty());
-		when(auditRecordService.wasPageAlreadyAudited(3L, 2L)).thenThrow(new InterruptedException("stop"));
+		when(auditRecordService.save(any())).thenReturn(savedRecord);
+		when(savedRecord.getId()).thenReturn(77L);
+		org.mockito.Mockito.doThrow(new InterruptedException("stop"))
+			.when(auditRecordTopic)
+			.publish(any(String.class));
 
 		ResponseEntity<String> response = controller.receiveMessage(body);
 
