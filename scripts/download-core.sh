@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Download LookseeCore JAR from GitHub release
-# This script downloads the core-0.1.5.jar from the GitHub release
+# This script downloads the core JAR from the GitHub release
 
 VERSION="0.3.1"
 REPO="deepthought42/LookseeCore"

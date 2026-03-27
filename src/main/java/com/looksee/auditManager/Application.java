@@ -1,9 +1,5 @@
 package com.looksee.auditManager;
 
-import java.util.Random;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -13,10 +9,20 @@ import org.springframework.context.annotation.PropertySources;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 
 /**
- * Main application class for the audit manager microservice.
+ * Entry point for the Audit Manager Spring Boot microservice.
+ *
+ * <p>Bootstraps the application context, scanning only the
+ * {@code com.looksee.auditManager} package for components while pulling
+ * entity and repository definitions from the LookseeCore library.
+ *
+ * <p>The auto-configuration class {@link com.looksee.LookseeCoreAutoConfiguration}
+ * is explicitly excluded to avoid a circular-import issue; the beans it would
+ * create are instead defined in
+ * {@link com.looksee.auditManager.config.PubSubConfig}.
+ *
+ * @see com.looksee.auditManager.config.PubSubConfig
  */
 @SpringBootApplication(exclude = {
-    // Exclude LookseeCoreAutoConfiguration to prevent circular import issue
     com.looksee.LookseeCoreAutoConfiguration.class
 })
 @ComponentScan(basePackages = {"com.looksee.auditManager"})
@@ -31,12 +37,8 @@ import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 	"com.looksee.gcp"
 })
 public class Application {
-	@SuppressWarnings("unused")
-	private final Logger log = LoggerFactory.getLogger(this.getClass());
-	private static final Random rand = new Random(2020);
 
-	public static void main(String[] args)  {
+	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
-
 }

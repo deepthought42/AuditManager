@@ -10,21 +10,6 @@ resilience4j.retry:
                 - java.net.SocketException
                 - java.net.ConnectException
                 - java.lang.Exception
-        webdriver:
-            maxAttempts: 1
-            waitDuration: 1s
-            retryExceptions:
-                - org.openqa.selenium.WebDriverException
-                - org.openqa.grid.common.exception.GridException
-                - org.openqa.selenium.remote.UnreachableBrowserException
-                - org.openqa.selenium.NoSuchSessionException
-                - org.openqa.selenium.NoSuchElementException
-                - org.openqa.selenium.ScriptTimeoutException
-                - java.lang.Exception
-                - java.io.IOException
-                - java.net.ConnectException
-                - java.net.SocketException
-                - java.lang.NullPointerException
         neoforj:
             maxAttempts: 10
             waitDuration: 10s
@@ -50,22 +35,9 @@ resilience4j.retry:
                 - java.nio.channels.ClosedChannelException
                 - java.lang.RuntimeException
                 - javax.imageio.IIOException
-        builder:
-            maxAttempts: 5
-            waitDuration: 2s
-            retryExceptions:
-                - org.openqa.selenium.WebDriverException
-                - org.openqa.grid.common.exception.GridException
-                - org.openqa.selenium.remote.UnreachableBrowserException
-                - org.openqa.selenium.NoSuchSessionException
-                - java.io.IOException
-                - java.net.ConnectException
-                - java.net.SocketException
     instances:
         neoforj:
             baseConfig: neoforj
-        webdriver:
-            baseConfig: webdriver
         gcp:
             baseConfig: gcp
         default:
