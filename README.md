@@ -1,367 +1,245 @@
 # Audit Manager
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e2376d355755402aaa5bf7c533750851)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=deepthought42/WebTestVisualizer&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e2376d355755402aaa5bf7c533750851)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=deepthought42/AuditManager&amp;utm_campaign=Badge_Grade)
 
 ## Overview
 
-The **Audit Manager** is a Spring Boot microservice that orchestrates web page audits as part of the Look-see platform. It serves as the central coordinator for managing and tracking comprehensive website audits, including visual design, information architecture, and content quality assessments.
+The **Audit Manager** is a Spring Boot microservice that orchestrates web page audits as part of the Looksee platform. It receives page-built notifications via Google Cloud Pub/Sub, determines whether a page is eligible for auditing, creates audit records in Neo4j, and publishes page-audit messages for downstream microservices to consume.
 
 ## What It Does
 
-The Audit Manager is responsible for:
-
-- **Audit Orchestration**: Receives page build notifications and coordinates the execution of various audit types
-- **Audit Tracking**: Maintains audit records and tracks the status of individual page audits
-- **Message Routing**: Publishes audit messages to appropriate microservices via Google Cloud Pub/Sub
-- **Duplicate Prevention**: Ensures pages are not audited multiple times
-- **Audit Type Management**: Configures and manages different types of audits based on requirements
+- **Audit Orchestration** -- Receives page-built notifications and coordinates the execution of various audit types.
+- **Audit Tracking** -- Creates and persists `PageAuditRecord` entries linked to a parent `DomainAuditRecord`.
+- **Message Routing** -- Publishes `PageAuditMessage` payloads to Google Cloud Pub/Sub for downstream consumers.
+- **Duplicate Prevention** -- Ensures a page is not audited more than once within the same domain audit.
+- **Audit Type Management** -- Resolves audit types from the parent domain record or falls back to a default set.
 
 ## Supported Audit Types
 
 The system supports the following audit categories:
 
-### Visual Design Audits
-- **Text Background Contrast**: Evaluates text readability against background colors
-- **Non-Text Background Contrast**: Assesses contrast for UI elements and graphics
+### Visual Design
+| Audit | Description |
+|-------|-------------|
+| Text Background Contrast | Evaluates text readability against background colors |
+| Non-Text Background Contrast | Assesses contrast for UI elements and graphics |
 
-### Information Architecture Audits
-- **Links**: Analyzes link structure and navigation
-- **Titles**: Evaluates page titles and heading hierarchy
-- **Encrypted**: Checks for proper encryption and security
-- **Metadata**: Reviews meta tags and SEO elements
+### Information Architecture
+| Audit | Description |
+|-------|-------------|
+| Links | Analyzes link structure and navigation |
+| Titles | Evaluates page titles and heading hierarchy |
+| Encrypted | Checks for proper encryption (HTTPS) |
+| Metadata | Reviews meta tags and SEO elements |
 
-### Content Audits
-- **Alt Text**: Validates image accessibility with proper alt text
-- **Reading Complexity**: Analyzes content readability and complexity
-- **Paragraphing**: Evaluates content structure and paragraph organization
-- **Image Copyright**: Checks for proper image licensing and attribution
-- **Image Policy**: Ensures images comply with organizational policies
+### Content Quality
+| Audit | Description |
+|-------|-------------|
+| Alt Text | Validates image accessibility with proper alt text |
+| Reading Complexity | Analyzes content readability and complexity |
+| Paragraphing | Evaluates content structure and paragraph organization |
+| Image Copyright | Checks for proper image licensing and attribution |
+| Image Policy | Ensures images comply with organizational policies |
 
 ## Architecture
 
 ### Technology Stack
-- **Java 17**: Core programming language
-- **Spring Boot 2.6.13**: Application framework
-- **Neo4j**: Graph database for audit record storage
-- **Google Cloud Pub/Sub**: Message queuing and event streaming
-- **Selenium**: Web automation for page analysis
-- **Google Cloud Vision API**: Image analysis capabilities
-- **Resilience4j**: Circuit breaker and retry mechanisms
+
+| Technology | Purpose |
+|------------|---------|
+| Java 17 | Core language |
+| Spring Boot 2.6.13 | Application framework |
+| Neo4j + Spring Data Neo4j | Graph database for audit records |
+| Google Cloud Pub/Sub | Asynchronous message passing |
+| Google Cloud Secret Manager | Secrets management |
+| Jackson | JSON serialization / deserialization |
 
 ### Key Components
 
-#### 1. AuditController
-The main REST controller that:
-- Receives Base64-encoded messages from Pub/Sub
-- Processes `PageBuiltMessage` notifications
-- Creates audit records and publishes audit messages
-- Prevents duplicate audits
+#### AuditController
 
-#### 2. AuditRecordService
-Manages audit record lifecycle:
-- Creates and updates audit records
-- Tracks audit status and progress
-- Links page audits to domain audits
-- Prevents duplicate page audits
+REST controller (`POST /`) that:
+1. Validates and Base64-decodes incoming Pub/Sub push messages.
+2. Deserializes the payload into a `PageBuiltMessage`.
+3. Checks eligibility (not already audited, page is landable, `PageState` exists).
+4. Creates a `PageAuditRecord`, links it to the domain audit, and publishes a `PageAuditMessage`.
 
-#### 3. PageStateService
-Handles page state information:
-- Validates if pages are "landable" (accessible)
-- Retrieves page metadata and URLs
-- Manages page state persistence
+**Design-by-contract highlights:**
+- Constructor enforces non-null dependencies via `Objects.requireNonNull`.
+- Assertions guard internal invariants (non-null intermediate values, non-empty audit name sets).
+- Every code path returns an appropriate HTTP status (`200`, `400`, or `500`).
 
-#### 4. PubSubPageAuditPublisherImpl
-Publishes audit messages to:
-- Page audit topic for individual page processing
-- Audit update topic for progress notifications
+#### PubSubConfig
 
-### Data Models
+Spring `@Configuration` class that manually defines the LookseeCore beans
+(`AuditRecordService`, `PageStateService`, `PubSubPageAuditPublisherImpl`)
+excluded from auto-configuration. Each bean uses `@ConditionalOnMissingBean`
+so test overrides take precedence.
 
-#### AuditRecord (Base)
-- Abstract base class for all audit records
-- Contains common audit metadata
+### Data Flow
 
-#### DomainAuditRecord
-- Represents a domain-wide audit
-- Contains audit configuration and labels
-- Links to multiple page audits
-
-#### PageAuditRecord
-- Represents a single page audit
-- Contains page state and audit configuration
-- Tracks execution status
-
-#### PageState
-- Contains page metadata (URL, accessibility, etc.)
-- Used to determine if pages should be audited
-
-## How It Works
-
-### 1. Message Reception
-The service receives Base64-encoded messages via HTTP POST to the root endpoint (`/`). Messages contain:
-- Account ID
-- Page ID
-- Audit Record ID
-- Page metadata
-
-### 2. Message Processing
-1. **Decode**: Base64 decode the incoming message
-2. **Parse**: Convert JSON to `PageBuiltMessage` object
-3. **Validate**: Check if page has already been audited
-4. **Verify**: Ensure page is "landable" (accessible)
-
-### 3. Audit Creation
-If the page is eligible for audit:
-1. **Create PageAuditRecord**: Initialize with default audit types
-2. **Link to Domain**: Associate with domain audit record
-3. **Set Status**: Mark as `BUILDING_PAGE`
-4. **Save**: Persist to Neo4j database
-
-### 4. Message Publishing
-Publishes `PageAuditMessage` to Pub/Sub topic containing:
-- Account ID
-- Page Audit Record ID
-
-### 5. Audit Execution
-Other microservices consume the audit messages and perform:
-- Visual analysis using Selenium and image processing
-- Content analysis using NLP and text processing
-- Accessibility evaluation
-- SEO and metadata analysis
+```
+Pub/Sub push  ──►  AuditController.receiveMessage()
+                        │
+                        ├─ validate & decode Base64
+                        ├─ parse JSON → PageBuiltMessage
+                        ├─ check eligibility (duplicate? landable? state exists?)
+                        ├─ resolve audit names (domain labels or defaults)
+                        ├─ create & persist PageAuditRecord
+                        └─ publish PageAuditMessage → Pub/Sub topic
+```
 
 ## Configuration
 
-### Environment Variables
+### Environment Variables / Properties
+
 ```properties
-# Server Configuration
+# Server
 server.port=8080
 management.server.port=80
 
-# Neo4j Configuration
-spring.data.neo4j.uri=NEO4J_BOLT_URI
-spring.data.neo4j.username=NEO4J_USERNAME
-spring.data.neo4j.password=NEO4J_PASSWORD
-spring.data.neo4j.database=NEO4J_DATABASE_NAME
+# Neo4j
+spring.data.neo4j.uri=bolt://host:7687
+spring.data.neo4j.username=neo4j
+spring.data.neo4j.password=<secret>
+spring.data.neo4j.database=neo4j
 
-# Google Cloud Configuration
-spring.cloud.gcp.project-id=PROJECT_ID
-spring.cloud.gcp.credentials.location=GCP_CREDENTIALS_LOCATION
+# Google Cloud
+spring.cloud.gcp.project-id=<project-id>
+spring.cloud.gcp.credentials.location=<path>
 
 # Pub/Sub Topics
-pubsub.page_audit_topic=PAGE_AUDIT_TOPIC
-pubsub.audit_update=AUDIT_UPDATE_TOPIC
-pubsub.error_topic=AUDIT_ERROR_TOPIC
+pubsub.page_audit_topic=<topic>
+pubsub.audit_update=<topic>
+pubsub.error_topic=<topic>
 ```
 
-### Resilience4j Configuration
-The application includes comprehensive retry and circuit breaker configurations for:
-- **Neo4j**: 10 retries with 10s delays
-- **WebDriver**: 1 retry with 1s delay
-- **GCP Services**: 5 retries with 5s delays
-- **General HTTP**: 1 retry with 5s delay
+### Resilience4j Retry Policies
+
+Configured in `application.yml`:
+
+| Profile | Max Attempts | Wait | Use Case |
+|---------|-------------|------|----------|
+| default | 1 | 5 s | General HTTP / IO errors |
+| neoforj | 10 | 10 s | Neo4j connection / transaction errors |
+| gcp | 5 | 5 s | GCP storage and gRPC errors |
 
 ## Getting Started
 
 ### Prerequisites
+
 - Java 17
 - Maven 3.9+
-- Neo4j Database
-- Google Cloud Platform account
+- Neo4j database
+- Google Cloud Platform account with Pub/Sub and Secret Manager enabled
 - Docker (optional)
 
 ### Local Development
 
-#### Install LookseeCore JAR to Local Maven Repository
-
-Before building, you must install the LookseeCore JAR to your local Maven repository:
+#### 1. Install the LookseeCore JAR
 
 ```bash
-mvn install:install-file -Dfile=libs/core-0.3.1.jar -DgroupId=com.looksee -DartifactId=core -Dversion=0.3.1 -Dpackaging=jar
+mvn install:install-file \
+  -Dfile=libs/core-0.3.1.jar \
+  -DgroupId=com.looksee \
+  -DartifactId=core \
+  -Dversion=0.3.1 \
+  -Dpackaging=jar
 ```
 
-This ensures the core library is available for local builds and runs.
+#### 2. Build
 
-#### Build the Application
 ```bash
 mvn clean install
 ```
 
-#### Run Locally
+#### 3. Run
+
 ```bash
-java -ea -jar target/audit-manager-1.0.1.jar
+java -ea -jar target/audit-manager-1.0.11.jar
 ```
 
-**Note**: The `-ea` flag enables assertions for debugging.
+The `-ea` flag enables Java assertions used for design-by-contract checks.
 
-#### Docker (Alternative)
+#### 4. Docker (alternative)
+
 ```bash
-# Build image
 docker build --tag audit-manager .
-
-# Run container
 docker run -p 80:80 -p 8080:8080 --name audit-manager audit-manager
 ```
-
-### Neo4j Setup
-
-#### 1. Create Firewall Rules
-```bash
-gcloud compute firewall-rules create allow-neo4j-bolt-http-https \
-  --allow tcp:7473,tcp:7474,tcp:7687 \
-  --source-ranges 0.0.0.0/0 \
-  --target-tags neo4j
-```
-
-#### 2. Create Neo4j Instance
-```bash
-gcloud config set project YOUR_PROJECT_ID
-gcloud compute instances create neo4j-prod \
-  --machine-type e2-medium \
-  --image-project launcher-public \
-  --image neo4j-community-1-4-3-6-apoc \
-  --tags neo4j,http-server,https-server
-```
-
-#### 3. Configure Neo4j
-Follow the [DigitalOcean Neo4j setup guide](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-neo4j-on-ubuntu-20-04) for detailed configuration steps.
 
 ### Deployment
 
 #### Google Cloud Run
+
 ```bash
-# Build and push to Google Container Registry
-docker build --no-cache -t gcr.io/YOUR_PROJECT_ID/audit-manager:v1.0.1 .
-docker push gcr.io/YOUR_PROJECT_ID/audit-manager:v1.0.1
+docker build --no-cache -t gcr.io/<PROJECT_ID>/audit-manager:<version> .
+docker push gcr.io/<PROJECT_ID>/audit-manager:<version>
 ```
 
 #### Docker Hub
+
 ```bash
-# Build and push to Docker Hub
-docker build -t your-username/audit-manager:v1.0.1 .
-docker push your-username/audit-manager:v1.0.1
+docker build -t <username>/audit-manager:<version> .
+docker push <username>/audit-manager:<version>
 ```
 
 ## API Reference
 
 ### POST /
-Receives page build notifications and initiates audits.
 
-**Request Body**:
+Receives a Pub/Sub push message containing a page-built notification.
+
+**Request body:**
 ```json
 {
   "message": {
-    "data": "base64-encoded-message",
-    "messageId": "message-id",
-    "publishTime": "2023-01-01T00:00:00Z"
+    "data": "<base64-encoded PageBuiltMessage JSON>",
+    "messageId": "...",
+    "publishTime": "2024-01-01T00:00:00Z"
   }
 }
 ```
 
-**Response**:
-- `200 OK`: Message processed successfully
-- `400 Bad Request`: Invalid payload, message encoding, or message format
-- `500 Internal Server Error`: Processing error
+**Decoded `data` payload (`PageBuiltMessage`):**
+```json
+{
+  "accountId": 1,
+  "pageId": 2,
+  "auditRecordId": 3
+}
+```
+
+**Responses:**
+
+| Status | Condition |
+|--------|-----------|
+| `200 OK` | Message processed (audit created or page skipped) |
+| `400 Bad Request` | Missing/empty payload, invalid Base64, or unparseable JSON |
+| `500 Internal Server Error` | Infrastructure failure (Pub/Sub publish error, interruption) |
 
 ## Testing
 
-### Run Tests
 ```bash
 mvn test
 ```
 
-### Test Messages
-Sample test messages are available in `src/test/resources/test_messages/UrlMessage` for:
-- Domain page audit paths
-- Single page audit paths
+Unit tests cover:
+- Invalid and missing payloads (`400` responses)
+- Duplicate, non-landable, and missing-state skip paths
+- Successful audit creation and Pub/Sub publishing
+- Domain-level audit label resolution
+- Error handling for `ExecutionException` and `InterruptedException`
 
-## Monitoring and Logging
+## Logging
 
-### Logging
-- Logs are written to `look-see.log`
-- Log level: WARN (configurable)
-- Console and file appenders enabled
+| Destination | Level |
+|-------------|-------|
+| Console (`CONSOLE` appender) | WARN |
+| File (`look-see.log`) | WARN |
 
-### Health Checks
-- Management endpoint: `http://localhost:80/actuator/health`
-- Application endpoint: `http://localhost:8080/`
-
-### Metrics
-The application exposes Spring Boot Actuator endpoints for monitoring:
-- Health status
-- Application metrics
-- Environment information
-
-## Security
-
-### SSL Certificate Generation
-To generate a new PKCS12 certificate for SSL:
-
-```bash
-openssl pkcs12 -export -inkey private.key -in certificate.crt -out api_key.p12
-```
-
-### Environment Security
-- Use Google Cloud Secret Manager for sensitive configuration
-- Store credentials securely using environment variables
-- Enable SSL/TLS for production deployments
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
+Application-level log output uses SLF4J with structured messages (key=value pairs).
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-For issues and questions:
-- Create an issue on GitHub
-- Check the [CHANGELOG.md](CHANGELOG.md) for recent updates
-- Review the configuration examples in this README
-
-## Code Review Findings and Proposed Fixes
-
-A focused code review identified several reliability and maintainability issues.
-
-### ✅ Fixed in this update
-
-1. **Controller returned HTTP 200 even on malformed payloads**
-   - **Issue**: Invalid Base64/JSON payloads were logged and still returned success.
-   - **Fix**: Added explicit request validation and now return `400 Bad Request` for invalid payloads.
-
-2. **Potential `NoSuchElementException` when `PageState` is absent**
-   - **Issue**: `page_state.get()` could be called even when empty.
-   - **Fix**: Guarded audit creation behind `page_state.isPresent()` and log skip conditions.
-
-3. **Unsafe casting from `AuditRecord` to `DomainAuditRecord`**
-   - **Issue**: Direct cast could fail at runtime if record type differs.
-   - **Fix**: Added `instanceof` check before casting and safe fallback to default audit labels.
-
-4. **Excessive payload logging and stack-trace printing**
-   - **Issue**: Full message payload and `printStackTrace()` increase noise and risk sensitive log exposure.
-   - **Fix**: Switched to structured SLF4J logging and removed raw stack-trace printing.
-
-5. **Build resolution failure due to missing Maven Central repository**
-   - **Issue**: Dependency BOM imports failed when resolving through `atlassian-public`.
-   - **Fix**: Added explicit Maven Central repository to `pom.xml`.
-
-6. **Controller testability gaps from field injection and no unit tests**
-   - **Issue**: Field injection and no tests made regression detection difficult.
-   - **Fix**: Switched to constructor injection and added controller unit tests for invalid payload paths and duplicate-page skip behavior.
-
-### 📌 Additional proposed follow-up fixes
-
-1. **Introduce input schema validation and request signature verification**
-   - Helps prevent malformed or spoofed Pub/Sub messages.
-
-2. **Replace hard-coded default audit labels with configuration**
-   - Improves operational flexibility without code changes.
-
-3. **Reduce DEBUG logging defaults in production**
-   - Current bean-level DEBUG logs can create high-volume output.
-
+This project is licensed under the Apache License 2.0 -- see the [LICENSE](LICENSE) file for details.

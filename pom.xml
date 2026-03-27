@@ -55,25 +55,6 @@
 		    <version>${springboot.version}</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.neo4j/neo4j-ogm-bolt-driver -->
-		<dependency>
-		    <groupId>org.neo4j</groupId>
-		    <artifactId>neo4j-ogm-bolt-driver</artifactId>
-		    <version>3.2.38</version>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/org.springframework.retry/spring-retry -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-aop</artifactId>
-			<version>${springboot.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
-			<version>2.1.5</version>
-		</dependency>
 
 	    <dependency>
 	      	<groupId>com.google.cloud</groupId>
@@ -106,13 +87,6 @@
 		<dependency>
 		    <groupId>com.fasterxml.jackson.datatype</groupId>
 		    <artifactId>jackson-datatype-jsr310</artifactId>
-		    <version>2.12.2</version>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jdk8 -->
-		<dependency>
-		    <groupId>com.fasterxml.jackson.datatype</groupId>
-		    <artifactId>jackson-datatype-jdk8</artifactId>
 		    <version>2.12.2</version>
 		</dependency>
 
@@ -151,13 +125,6 @@
 				<configuration>
 					<source>${maven.compiler.source}</source>
 					<target>${maven.compiler.target}</target>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-							<version>1.18.30</version>
-						</path>
-					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -262,24 +229,6 @@
             <name>Maven Central</name>
             <url>https://repo.maven.apache.org/maven2</url>
             <layout>default</layout>
-        </repository>
-        <repository>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-            <id>atlassian-public</id>
-            <name>Atlassian Public</name>
-            <url>https://packages.atlassian.com/maven/repository/public</url>
         </repository>
     </repositories>
 </project>
